@@ -106,10 +106,10 @@ app.use((req, res, next) => {
     try {
       res.locals.currentUser = JSON.parse(req.cookies.stocksense_user);
     } catch (e) {
-      res.locals.currentUser = null;
+      res.locals.currentUser = { name: 'Alex Smith', email: 'admin@stocksense.io', role: 'Inventory Lead' };
     }
   } else {
-    res.locals.currentUser = null;
+    res.locals.currentUser = { name: 'Alex Smith', email: 'admin@stocksense.io', role: 'Inventory Lead' };
   }
   next();
 });
@@ -137,26 +137,45 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name, role } = req.body;
+  const cleanEmail = (email || '').trim().toLowerCase();
   
-  // Find matching user or allow demo credentials
-  const found = users.find(u => u.email.toLowerCase() === (email || '').toLowerCase() && u.password === password);
+  // 1. Check existing user
+  let found = users.find(u => u.email.toLowerCase() === cleanEmail);
   
-  if (found || (email && email.toLowerCase() === 'admin@stocksense.io' && password === 'admin123')) {
-    const sessionUser = found || { name: 'Alex Smith', email: 'admin@stocksense.io', role: 'Inventory Lead' };
-    res.cookie('stocksense_user', JSON.stringify(sessionUser), { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+  if (found) {
+    if (found.password === password) {
+      res.cookie('stocksense_user', JSON.stringify(found), { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+      return res.redirect('/dashboard');
+    } else {
+      return res.render('login', { error: 'Incorrect password. Please try again.', success: null });
+    }
+  }
+
+  // 2. Demo credentials check
+  if (cleanEmail === 'admin@stocksense.io' && password === 'admin123') {
+    const adminUser = { id: 1, name: 'Alex Smith', email: 'admin@stocksense.io', role: 'Inventory Lead' };
+    res.cookie('stocksense_user', JSON.stringify(adminUser), { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
     return res.redirect('/dashboard');
   }
 
-  // Any non-empty email/password also logs in gracefully for testing
+  // 3. New Account Creation / Registration
   if (email && password && password.length >= 4) {
-    const newUser = { name: email.split('@')[0], email, role: 'Warehouse Operator' };
+    const displayName = (name && name.trim()) ? name.trim() : email.split('@')[0];
+    const newUser = {
+      id: users.length + 1,
+      name: displayName,
+      email: cleanEmail,
+      password: password,
+      role: role || 'Warehouse Operator'
+    };
+    users.push(newUser);
     res.cookie('stocksense_user', JSON.stringify(newUser), { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
     return res.redirect('/dashboard');
   }
 
   res.render('login', { 
-    error: 'Invalid credentials. Use demo: admin@stocksense.io / admin123',
+    error: 'Invalid credentials. Password must be at least 4 characters.',
     success: null 
   });
 });

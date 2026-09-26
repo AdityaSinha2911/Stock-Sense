@@ -1,4 +1,8 @@
 <!-- Top Navigation Bar -->
+<%
+  const navUser = typeof currentUser !== 'undefined' && currentUser ? currentUser : { name: 'Alex Smith', email: 'admin@stocksense.io', role: 'Warehouse Admin' };
+  const navInitials = (navUser.name || 'Alex Smith').split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+%>
 <header class="app-navbar d-flex align-items-center justify-content-between px-3 px-lg-4 py-2 border-bottom bg-white sticky-top">
   <!-- Left: Sidebar Toggle & Page Title / Breadcrumbs -->
   <div class="d-flex align-items-center gap-3">
@@ -113,19 +117,19 @@
     <!-- User Profile Dropdown -->
     <div class="dropdown">
       <button class="btn btn-light btn-sm d-flex align-items-center gap-2 p-1 pe-2 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <div class="avatar-circle bg-success text-white fw-bold" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content-center; font-size: 0.8rem;">
-          AS
+        <div class="avatar-circle bg-success text-white fw-bold" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+          <%= navInitials %>
         </div>
         <div class="text-start d-none d-xl-block">
-          <div class="fw-semibold text-dark lh-1" style="font-size: 0.82rem;">Alex Smith</div>
-          <small class="text-muted" style="font-size: 0.7rem;">Warehouse Admin</small>
+          <div class="fw-semibold text-dark lh-1" style="font-size: 0.82rem;"><%= navUser.name %></div>
+          <small class="text-muted" style="font-size: 0.7rem;"><%= navUser.role || 'Warehouse Admin' %></small>
         </div>
         <i class="bi bi-chevron-down text-muted small ms-1"></i>
       </button>
       <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="font-size: 0.85rem; min-width: 180px;">
         <li class="px-3 py-1">
-          <div class="fw-semibold text-dark">Alex Smith</div>
-          <div class="text-muted small">alex.smith@stocksense.io</div>
+          <div class="fw-semibold text-dark"><%= navUser.name %></div>
+          <div class="text-muted small"><%= navUser.email %></div>
         </li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"><i class="bi bi-person text-secondary"></i> My Profile</a></li>
