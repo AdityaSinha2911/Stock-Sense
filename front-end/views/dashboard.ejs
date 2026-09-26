@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | StockSense IMS</title>
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --ss-primary: #157347;
+      --ss-primary-hover: #115c38;
+      --ss-primary-light: #e8f5e9;
+      --ss-primary-border: #c3e6cb;
+      --ss-bg: #f4f7f6;
+      --ss-card-border: #e1e8e5;
+      --ss-text-main: #1e293b;
+      --ss-text-muted: #64748b;
+      --ss-sidebar-width: 260px;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--ss-bg);
+      color: var(--ss-text-main);
+    }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .app-sidebar {
+      width: var(--ss-sidebar-width);
+      flex-shrink: 0;
+      background: #ffffff;
+      border-right: 1px solid var(--ss-card-border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 1030;
+      transition: transform 0.25s ease-in-out;
+    }
+    .app-main { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; background-color: var(--ss-bg); }
+    .app-content { flex-grow: 1; padding: 1.75rem; }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.65rem 0.95rem;
+      color: #475569;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      margin-bottom: 0.2rem;
+      transition: all 0.15s ease;
+    }
+    .sidebar-link:hover { background-color: #f1f5f9; color: var(--ss-primary); }
+    .sidebar-link.active { background-color: var(--ss-primary-light); color: var(--ss-primary); font-weight: 600; }
+    .sidebar-link i { font-size: 1.15rem; margin-right: 0.75rem; width: 22px; text-align: center; }
+    .pulse-dot {
+      width: 8px; height: 8px; background-color: #198754; border-radius: 50%; display: inline-block;
+      animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    }
+    .ss-card {
+      background: #ffffff;
+      border: 1px solid var(--ss-card-border);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: box-shadow 0.2s ease;
+    }
+    .ss-card:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); }
+    .kpi-card { border-left: 4px solid var(--ss-primary); }
+    .kpi-blue { border-left-color: #0d6efd !important; }
+    .kpi-amber { border-left-color: #f59e0b !important; }
+    .kpi-purple { border-left-color: #8b5cf6 !important; }
+    .badge-status {
+      font-weight: 500; font-size: 0.75rem; padding: 0.35em 0.8em; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .badge-done { background-color: #d1e7dd; color: #0f5132; }
+    .badge-ready { background-color: #cff4fc; color: #055160; }
+    .badge-waiting { background-color: #fff3cd; color: #664d03; }
+    .badge-draft { background-color: #e2e3e5; color: #41464b; }
+    .badge-cancelled { background-color: #f8d7da; color: #842029; }
+    .badge-in-transit { background-color: #e0e7ff; color: #3730a3; }
+    @media (max-width: 991.98px) {
+      .app-sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .app-sidebar.show { transform: translateX(0); }
+      .app-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Sidebar Partial -->
+    <%- include('partials/sidebar', { activePage: 'dashboard' }) %>
+
+    <!-- Main Container -->
+    <div class="app-main">
+      <!-- Top Navbar Partial -->
+      <%- include('partials/navbar') %>
+
+      <!-- Main Content Area -->
+      <main class="app-content">
+        <!-- Page Title & Actions -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+          <div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none text-muted">StockSense</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Dashboard</li>
+              </ol>
+            </nav>
+            <h1 class="h3 fw-bold text-dark mb-0">Warehouse Analytics & Operations</h1>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select form-select-sm bg-white border" style="width: auto; border-radius: 8px;">
+              <option selected>Last 30 Days</option>
+              <option>This Quarter</option>
+              <option>Year to Date</option>
+            </select>
+            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 bg-white" style="border-radius: 8px;">
+              <i class="bi bi-download"></i> Export
+            </button>
+            <a href="/receipts" class="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm" style="border-radius: 8px;">
+              <i class="bi bi-plus-lg"></i> New Operation
+            </a>
+          </div>
+        </div>
+
+        <!-- 4 Top KPI Cards -->
+        <div class="row g-3 mb-4">
+          <!-- Total Valuation -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="ss-card kpi-card p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="text-muted small fw-medium">Inventory Valuation</span>
+                <span class="badge bg-success-subtle text-success small"><i class="bi bi-arrow-up-right me-1"></i>+8.4%</span>
+              </div>
+              <div class="h3 fw-bold text-dark mb-1">$284,520</div>
+              <div class="small text-muted d-flex align-items-center gap-1">
+                <i class="bi bi-boxes text-success"></i> 14,850 Total Units in Stock
+              </div>
+            </div>
+          </div>
+
+          <!-- Active SKUs -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="ss-card kpi-card kpi-blue p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="text-muted small fw-medium">Catalog Items</span>
+                <span class="badge bg-danger-subtle text-danger small"><i class="bi bi-exclamation-circle me-1"></i>18 Low Stock</span>
+              </div>
+              <div class="h3 fw-bold text-dark mb-1">1,420</div>
+              <div class="small text-muted d-flex align-items-center gap-1">
+                <i class="bi bi-tag text-primary"></i> Across 12 Product Categories
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Receipts -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="ss-card kpi-card kpi-amber p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="text-muted small fw-medium">Incoming Receipts</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis small">8 Arriving Today</span>
+              </div>
+              <div class="h3 fw-bold text-dark mb-1">14 Orders</div>
+              <div class="small text-muted d-flex align-items-center gap-1">
+                <i class="bi bi-truck text-warning-emphasis"></i> $42,600 Expected Value
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Deliveries -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="ss-card kpi-card kpi-purple p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="text-muted small fw-medium">Outgoing Deliveries</span>
+                <span class="badge bg-primary-subtle text-primary small">9 Ready to Dispatch</span>
+              </div>
+              <div class="h3 fw-bold text-dark mb-1">22 Shipments</div>
+              <div class="small text-muted d-flex align-items-center gap-1">
+                <i class="bi bi-box-arrow-up-right text-purple"></i> 7 Waiting for Stock
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operations Pipeline Cards (Odoo IMS Style) -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6 col-xl-3">
+            <div class="ss-card p-3 h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="p-2 rounded bg-success-subtle text-success">
+                    <i class="bi bi-arrow-down-left-square-fill fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0">Receipts</h6>
+                    <small class="text-muted">Inbound Shipments</small>
+                  </div>
+                </div>
+                <a href="/receipts" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-arrow-right"></i></a>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light-subtle mb-2">
+                <span class="small text-secondary">To Process</span>
+                <span class="fw-bold text-dark">8</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-danger-subtle">
+                <span class="small text-danger">Late / Overdue</span>
+                <span class="fw-bold text-danger">2</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="ss-card p-3 h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="p-2 rounded bg-warning-subtle text-warning-emphasis">
+                    <i class="bi bi-arrow-up-right-square-fill fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0">Deliveries</h6>
+                    <small class="text-muted">Outbound Orders</small>
+                  </div>
+                </div>
+                <a href="/deliveries" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-arrow-right"></i></a>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light-subtle mb-2">
+                <span class="small text-secondary">Ready to Pack & Ship</span>
+                <span class="fw-bold text-dark">9</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-warning-subtle">
+                <span class="small text-warning-emphasis">Waiting Availability</span>
+                <span class="fw-bold text-warning-emphasis">7</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="ss-card p-3 h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="p-2 rounded bg-info-subtle text-info-emphasis">
+                    <i class="bi bi-arrow-left-right fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0">Internal Transfers</h6>
+                    <small class="text-muted">Inter-Warehouse</small>
+                  </div>
+                </div>
+                <a href="/transfers" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-arrow-right"></i></a>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light-subtle mb-2">
+                <span class="small text-secondary">Scheduled Today</span>
+                <span class="fw-bold text-dark">4</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light-subtle">
+                <span class="small text-secondary">In Transit</span>
+                <span class="fw-bold text-dark">2</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="ss-card p-3 h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="p-2 rounded bg-secondary-subtle text-secondary-emphasis">
+                    <i class="bi bi-sliders2-vertical fs-5"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0">Adjustments</h6>
+                    <small class="text-muted">Cycle Count Audits</small>
+                  </div>
+                </div>
+                <a href="/adjustments" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-arrow-right"></i></a>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light-subtle mb-2">
+                <span class="small text-secondary">Pending Approval</span>
+                <span class="fw-bold text-dark">3</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-success-subtle">
+                <span class="small text-success">Applied This Month</span>
+                <span class="fw-bold text-success">12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-3 mb-4">
+          <!-- Movement Trends -->
+          <div class="col-xl-8">
+            <div class="ss-card p-4 h-100">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 class="fw-bold mb-1">Monthly Inbound vs. Outbound Movement</h6>
+                  <p class="text-muted small mb-0">Comparison of units received vs. shipped over the past 6 months</p>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-success-subtle text-success"><i class="bi bi-square-fill me-1"></i> Receipts</span>
+                  <span class="badge bg-warning-subtle text-warning-emphasis"><i class="bi bi-square-fill me-1"></i> Deliveries</span>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="movementChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Valuation Donut -->
+          <div class="col-xl-4">
+            <div class="ss-card p-4 h-100">
+              <div class="mb-3">
+                <h6 class="fw-bold mb-1">Valuation by Category</h6>
+                <p class="text-muted small mb-0">Stock distribution across warehouse segments</p>
+              </div>
+              <div style="height: 220px; position: relative;" class="d-flex align-items-center justify-content-center">
+                <canvas id="categoryChart"></canvas>
+              </div>
+              <div class="mt-3 pt-3 border-top small">
+                <div class="d-flex justify-content-between mb-1">
+                  <span><i class="bi bi-circle-fill text-success me-1"></i> Raw Materials</span>
+                  <span class="fw-semibold">$124,000 (44%)</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span><i class="bi bi-circle-fill text-primary me-1"></i> Finished Goods</span>
+                  <span class="fw-semibold">$89,200 (31%)</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span><i class="bi bi-circle-fill text-warning me-1"></i> Packaging & Hardware</span>
+                  <span class="fw-semibold">$71,320 (25%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lower Section: Critical Alerts & Recent Activity -->
+        <div class="row g-3">
+          <!-- Low Stock Warnings -->
+          <div class="col-xl-7">
+            <div class="ss-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 class="fw-bold mb-1 text-danger d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Critical Low Stock Alerts
+                  </h6>
+                  <p class="text-muted small mb-0">Items that have fallen below their safety threshold</p>
+                </div>
+                <a href="/products" class="btn btn-sm btn-outline-danger" style="border-radius: 8px;">View All Items</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>SKU</th>
+                      <th>Location</th>
+                      <th class="text-center">On Hand</th>
+                      <th class="text-center">Min Level</th>
+                      <th class="text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="fw-semibold text-dark">Stainless Steel Hex Bolt M8</td>
+                      <td><span class="font-monospace text-muted small">BOLT-SS-08</span></td>
+                      <td>WH-01 / Zone A</td>
+                      <td class="text-center"><span class="badge bg-danger text-white">14 pcs</span></td>
+                      <td class="text-center text-muted">50 pcs</td>
+                      <td class="text-end">
+                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="fw-semibold text-dark">Thermal Silicone Paste 50g</td>
+                      <td><span class="font-monospace text-muted small">THM-SIL-50</span></td>
+                      <td>WH-01 / Zone B</td>
+                      <td class="text-center"><span class="badge bg-danger text-white">6 tubes</span></td>
+                      <td class="text-center text-muted">25 tubes</td>
+                      <td class="text-end">
+                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="fw-semibold text-dark">Microcontroller ATmega328P</td>
+                      <td><span class="font-monospace text-muted small">MCU-ATM-328</span></td>
+                      <td>WH-01 / Rack 04</td>
+                      <td class="text-center"><span class="badge bg-warning text-dark">28 units</span></td>
+                      <td class="text-center text-muted">100 units</td>
+                      <td class="text-end">
+                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="fw-semibold text-dark">Cardboard Shipping Box 12x12</td>
+                      <td><span class="font-monospace text-muted small">BOX-CRD-12</span></td>
+                      <td>WH-03 / Packaging</td>
+                      <td class="text-center"><span class="badge bg-warning text-dark">45 units</span></td>
+                      <td class="text-center text-muted">150 units</td>
+                      <td class="text-end">
+                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Movements Feed -->
+          <div class="col-xl-5">
+            <div class="ss-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Recent Stock Operations</h6>
+                <a href="/ledger" class="text-success small fw-medium text-decoration-none">Full Ledger &rarr;</a>
+              </div>
+              <div class="list-group list-group-flush">
+                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success p-2 rounded-circle"><i class="bi bi-box-arrow-in-down"></i></span>
+                    <div>
+                      <div class="fw-semibold text-dark small">WH/IN/00104 &bull; Received</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">+250 Steel Flanges from Acme</div>
+                    </div>
+                  </div>
+                  <span class="badge-status badge-done">Done</span>
+                </div>
+                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning-subtle text-warning-emphasis p-2 rounded-circle"><i class="bi bi-box-arrow-up-right"></i></span>
+                    <div>
+                      <div class="fw-semibold text-dark small">WH/OUT/00248 &bull; Dispatch</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">-120 Lithium Battery Packs</div>
+                    </div>
+                  </div>
+                  <span class="badge-status badge-ready">Ready</span>
+                </div>
+                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-info-subtle text-info-emphasis p-2 rounded-circle"><i class="bi bi-arrow-left-right"></i></span>
+                    <div>
+                      <div class="fw-semibold text-dark small">WH/INT/00085 &bull; Transfer</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Zone A &rarr; Zone C (50 units)</div>
+                    </div>
+                  </div>
+                  <span class="badge-status badge-in-transit">In Transit</span>
+                </div>
+                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis p-2 rounded-circle"><i class="bi bi-sliders"></i></span>
+                    <div>
+                      <div class="fw-semibold text-dark small">INV/ADJ/00031 &bull; Cycle Count</div>
+                      <div class="text-muted" style="font-size: 0.75rem;">Reconciled discrepancy (+4)</div>
+                    </div>
+                  </div>
+                  <span class="badge-status badge-done">Applied</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer Partial -->
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+
+  <!-- Dashboard Chart Initializations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Inbound vs Outbound Bar Chart
+      const ctxMovement = document.getElementById('movementChart');
+      if (ctxMovement) {
+        new Chart(ctxMovement, {
+          type: 'bar',
+          data: {
+            labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [
+              {
+                label: 'Inbound Receipts (Units)',
+                data: [3200, 4100, 3800, 5200, 4800, 5600],
+                backgroundColor: 'rgba(21, 115, 71, 0.85)',
+                borderRadius: 6
+              },
+              {
+                label: 'Outbound Deliveries (Units)',
+                data: [2800, 3400, 3100, 4600, 4300, 4900],
+                backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                borderRadius: 6
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#f1f5f9' },
+                ticks: { color: '#64748b' }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: '#64748b' }
+              }
+            }
+          }
+        });
+      }
+
+      // Category Donut Chart
+      const ctxCat = document.getElementById('categoryChart');
+      if (ctxCat) {
+        new Chart(ctxCat, {
+          type: 'doughnut',
+          data: {
+            labels: ['Raw Materials', 'Finished Goods', 'Packaging & Hardware'],
+            datasets: [{
+              data: [124000, 89200, 71320],
+              backgroundColor: ['#157347', '#0d6efd', '#f59e0b'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            cutout: '70%'
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
