@@ -1,105 +1,205 @@
 # 📦 StockSense — Modular Inventory Management System (IMS)
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express.js-v4.21+-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
-[![EJS](https://img.shields.io/badge/View_Engine-EJS-b4ca65?style=flat)](https://ejs.co/)
-[![Bootstrap](https://img.shields.io/badge/Styling-Bootstrap_5.3-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
-[![License](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-v4.21+-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![EJS Engine](https://img.shields.io/badge/View_Engine-EJS-b4ca65?style=for-the-badge&logo=ejs&logoColor=white)](https://ejs.co/)
+[![Bootstrap 5](https://img.shields.io/badge/UI_Framework-Bootstrap_5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](LICENSE)
 
-> A modern, modular, enterprise-grade Inventory Management System (IMS) designed to digitize and streamline end-to-end warehouse and stock operations within a business.
-
----
-
-## 🌟 Key Modules & Features
-
-### 📊 1. Operations & Analytics Dashboard (`/dashboard`)
-- **Real-Time KPIs**: Total inventory valuation, active SKU count, pending receipts, and outgoing delivery orders.
-- **Odoo-Style Operations Pipeline**: Visual cards for Inbound Receipts (`WH/IN`), Outbound Deliveries (`WH/OUT`), Internal Transfers (`WH/INT`), and Stock Adjustments (`INV/ADJ`).
-- **Interactive Visualizations**: Chart.js charts for monthly inbound vs. outbound trends and valuation distribution by category.
-- **Safety Stock Warning Center**: Instant alerts for products falling below safety thresholds with quick reorder triggers.
-
-### 📦 2. Product Catalog (`/products`)
-- **Inventory Master**: Full catalog management with SKUs, barcodes, unit of measures (pcs, kg, box), and cost/sales pricing.
-- **Stock Status Indicators**: Visual badges for `In Stock`, `Low Stock`, and `Out of Stock`.
-- **Search & Multi-Filters**: Instant search by SKU/name, category filtering, and location tagging.
-- **Modals**: Built-in modal forms for adding new products and performing quick stock adjustments.
-
-### 📥 3. Inbound Receipts (`/receipts`)
-- **Purchase Order Tracking**: Manage incoming supplier shipments (`WH/IN/XXXXX`).
-- **Inspection & Validation**: Status workflows (`Draft` &rarr; `Waiting` &rarr; `Ready` &rarr; `Done`).
-- **Goods Receipt Slips**: Generate and print inbound delivery verification slips.
-
-### 📤 4. Delivery Orders (`/deliveries`)
-- **Outbound Shipments**: Process sales order fulfillment and dispatches (`WH/OUT/XXXXX`).
-- **Carrier Logistics**: Integration fields for FedEx, UPS, DHL, tracking numbers, and delivery dates.
-- **Order States**: Track items from stock reservation to dispatch and delivery completion.
-
-### 🔄 5. Internal Stock Transfers (`/transfers`)
-- **Location Relocation**: Move stock seamlessly between warehouses, zones, racks, or staging bins (`WH/INT/XXXXX`).
-- **Forklift / Operator Assignment**: Assign team members and track transfer status (`In Transit`, `Scheduled`, `Completed`).
-
-### ⚖️ 6. Inventory Adjustments & Reconciliation (`/adjustments`)
-- **Physical Cycle Counts**: Reconcile recorded system stock with physical warehouse counts (`INV/ADJ/XXXXX`).
-- **Live Discrepancy Calculator**: Automatic variance and cost impact calculation.
-- **Audit Reasons**: Categorize discrepancies by Cycle Count, Damaged Goods, Shrinkage/Theft, or Expiry.
-
-### 📜 7. Stock Ledger & Audit Trail (`/ledger`)
-- **Immutable Log**: Comprehensive chronological record of all stock moves across the entire organization.
-- **Running Inventory Balance**: Real-time running quantities and book valuations after every movement.
-- **Financial Impact**: Track unit costs and valuation adjustments for accounting audits.
-
-### 🔐 8. Authentication & Navigation (`/login`)
-- **Modern Login Interface**: Responsive authentication card with session support and alerts.
-- **Global Navigation**: Header with quick search (`Ctrl + K`), system live sync status, and quick operation shortcuts.
+> **StockSense** is an enterprise-grade, modular Inventory Management System (IMS) inspired by ERP workflows (such as Odoo). It digitizes, automates, and connects every stage of the inventory lifecycle—from vendor procurement and receiving, through internal warehouse relocations and physical cycle counts, to customer dispatch and real-time financial stock valuation.
 
 ---
 
-## 🛠️ Tech Stack
-
-| Layer | Technologies |
-| :--- | :--- |
-| **Backend** | [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/) |
-| **Templating Engine** | [EJS (Embedded JavaScript)](https://ejs.co/) |
-| **Frontend Styling** | [Bootstrap 5.3.3](https://getbootstrap.com/), Custom Modern SaaS CSS |
-| **Iconography & Fonts** | [Bootstrap Icons v1.11.3](https://icons.getbootstrap.com/), Google Fonts (*Plus Jakarta Sans*) |
-| **Data Visualization** | [Chart.js](https://www.chartjs.org/) |
+## 📑 Table of Contents
+- [Project Overview](#-project-overview)
+- [System Architecture & Lifecycle](#-system-architecture--lifecycle)
+- [Core Modules & Features](#-core-modules--features)
+  - [1. Warehouse Analytics & Operations Dashboard](#1-warehouse-analytics--operations-dashboard)
+  - [2. Inventory Master & Product Catalog](#2-inventory-master--product-catalog)
+  - [3. Inbound Shipments & Receipts (WH/IN)](#3-inbound-shipments--receipts-whin)
+  - [4. Outbound Delivery Orders (WH/OUT)](#4-outbound-delivery-orders-whout)
+  - [5. Internal Stock Transfers (WH/INT)](#5-internal-stock-transfers-whint)
+  - [6. Inventory Adjustments & Stock Takes (INV/ADJ)](#6-inventory-adjustments--stock-takes-invadj)
+  - [7. Stock Ledger & Audit Trail](#7-stock-ledger--audit-trail)
+  - [8. Security & Authentication](#8-security--authentication)
+- [Technology Stack](#-technology-stack)
+- [Repository Structure](#-repository-structure)
+- [Getting Started](#-getting-started)
+- [API & Route Reference](#-api--route-reference)
+- [Keyboard Shortcuts](#-keyboard-shortcuts)
+- [Development Roadmap](#-development-roadmap)
+- [Contributing](#-contributing)
 
 ---
 
-## 📂 Project Structure
+## 🎯 Project Overview
 
-```text
-Stock-Sense/
-├── front-end/
-│   ├── public/
-│   │   └── css/
-│   │       └── style.css            # Custom layout & design tokens
-│   ├── views/
-│   │   ├── partials/
-│   │   │   ├── navbar.ejs           # Top navigation bar with search & shortcuts
-│   │   │   ├── sidebar.ejs          # Collapsible sidebar with active page states
-│   │   │   └── footer.ejs           # System footer & JS bundles
-│   │   ├── dashboard.ejs            # Main analytics & pipeline overview
-│   │   ├── products.ejs             # Product master catalog & modals
-│   │   ├── receipts.ejs             # Inbound shipments (WH/IN)
-│   │   ├── deliveries.ejs           # Outbound delivery orders (WH/OUT)
-│   │   ├── transfers.ejs            # Internal stock transfers (WH/INT)
-│   │   ├── adjustments.ejs          # Physical inventory reconciliation
-│   │   ├── ledger.ejs               # Chronological audit ledger
-│   │   └── login.ejs                # Authentication view
-│   └── login.html                   # Teammate static login template
-├── .gitignore                       # Node modules and temporary file rules
-├── package.json                     # Express & EJS dependencies
-├── server.js                        # Dev server & application routes
-└── README.md                        # Documentation
+Traditional inventory management often relies on fragmented spreadsheets, disconnected communication, and manual count reconciliations that lead to stockouts, inventory shrinkage, and inaccurate book valuations. 
+
+**StockSense** solves this by establishing a single source of truth across all warehouse operations:
+- **Traceability**: Every physical unit entering or leaving the warehouse is tagged to a verified document reference (`WH/IN`, `WH/OUT`, `WH/INT`, `INV/ADJ`).
+- **Real-Time Valuation**: Continuous double-entry inventory tracking ensures unit costs and total book values reflect live physical balances.
+- **Operational Efficiency**: Streamlined workflows for receiving clerks, warehouse pickers, forklift operators, and inventory auditors.
+
+---
+
+## 🔄 System Architecture & Lifecycle
+
+The inventory lifecycle in StockSense follows standard industrial supply-chain operations:
+
+```
+ [ Suppliers / Vendors ]
+            │
+            ▼ (Purchase Orders)
+ ┌─────────────────────────────────────────────────────────────┐
+ │  1. Inbound Receipts (WH/IN)                                │
+ │     - Goods inspection, staging bay allocation & validation │
+ └──────────────────────┬──────────────────────────────────────┘
+                        │
+                        ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │  2. Central Storage & Internal Transfers (WH/INT)           │
+ │     - Relocation between zones, racks, shelves & bins       │
+ └──────────────┬───────────────────────────────┬──────────────┘
+                │                               │
+                ▼                               ▼
+ ┌──────────────────────────────┐ ┌────────────────────────────┐
+ │ 3. Cycle Counts & Adjustments│ │ 4. Outbound Deliveries     │
+ │    (INV/ADJ)                 │ │    (WH/OUT)                │
+ │    - Damaged, loss & shrinkage│ │    - Sales order picking,  │
+ │    - Variance reconciliation │ │      packing, and carrier  │
+ └──────────────┬───────────────┘ │      shipping              │
+                │                 └─────────────┬──────────────┘
+                │                               │
+                └───────────────┬───────────────┘
+                                │
+                                ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │  5. Stock Ledger & Financial Valuation                      │
+ │     - Immutable audit trail, running balances & unit costs  │
+ └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Core Modules & Features
+
+### 1. Warehouse Analytics & Operations Dashboard
+- **Route**: `/dashboard`
+- **Real-time KPI Metrics**: Total Inventory Valuation, Active SKU Count, Inbound Shipments Awaiting Receipt, and Outbound Deliveries Ready for Dispatch.
+- **Odoo-Style Operations Pipeline**: Visual status counters for Receipts, Deliveries, Internal Transfers, and Pending Cycle Count Adjustments.
+- **Interactive Charts (Chart.js)**:
+  - *Monthly Movement Trends*: Compares inbound volume vs. outbound dispatch units over time.
+  - *Valuation by Category*: Donut distribution of capital across Raw Materials, Finished Goods, and Packaging.
+- **Safety Stock Warning Center**: High-priority alert table identifying items below minimum thresholds with direct reorder actions.
+
+### 2. Inventory Master & Product Catalog
+- **Route**: `/products`
+- **Product Master Records**: Manages product names, internal SKUs, international barcodes (EAN/UPC), and Units of Measure (`pcs`, `kg`, `units`, `box`, `m`).
+- **Dual Pricing**: Tracks both Cost Price (for valuation) and Sales Price (for billing).
+- **Stock Status Pills**: Dynamic color-coded indicators for `In Stock`, `Low Stock`, and `Out of Stock`.
+- **Search & Filtering**: Multi-criteria client-side search by keyword, category, and stock health status.
+- **Modals**: Full modals for adding new products and performing instant on-the-fly stock corrections.
+
+### 3. Inbound Shipments & Receipts (WH/IN)
+- **Route**: `/receipts`
+- **Procurement Fulfillment**: Logs purchase orders arriving from registered suppliers.
+- **Operational States**: `Draft` &rarr; `Waiting for Vendor` &rarr; `Ready to Receive` &rarr; `Done`.
+- **Receiving Validation**: Verifies incoming quantities against purchase order specifications.
+- **Documentation**: One-click generation and printing of Goods Receipt Slips.
+
+### 4. Outbound Delivery Orders (WH/OUT)
+- **Route**: `/deliveries`
+- **Sales Fulfillment**: Manages outgoing customer delivery orders and packing slips.
+- **Logistics & Carrier Integration**: Stores carrier details (FedEx, UPS, DHL, Company Fleet) and tracking waybill IDs.
+- **Reservation Checks**: Confirms available inventory before items are marked for packing.
+
+### 5. Internal Stock Transfers (WH/INT)
+- **Route**: `/transfers`
+- **Inter-Location Movement**: Tracks stock relocation across warehouse buildings, zones, aisles, and storage bins.
+- **Operator Assignment**: Assigns tasks to specific floor staff or forklift operators with scheduled timestamps.
+- **Live Transfer Status**: Tracks items `Scheduled`, `In Transit`, or `Completed`.
+
+### 6. Inventory Adjustments & Stock Takes (INV/ADJ)
+- **Route**: `/adjustments`
+- **Cycle Count Audits**: Reconciles physical count discrepancies against recorded book stock.
+- **Automated Discrepancy Engine**: Live calculation of quantity variance (`+` / `-`) and associated financial impact.
+- **Categorized Reasons**: Segregates variances by Cycle Count Discrepancy, Damaged Goods, Shrinkage/Theft, Expiry, or Unrecorded Returns.
+- **Manager Approval Workflow**: Prevents unauthorized inventory manipulation through formal audit status stages (`Pending Review` &rarr; `Applied`).
+
+### 7. Stock Ledger & Audit Trail
+- **Route**: `/ledger`
+- **Complete Audit Trail**: Chronological, immutable record of every single inventory movement in the system.
+- **Double-Entry Visibility**: Logs exact Source & Destination coordinates for every move.
+- **Running Balance Ledger**: Real-time recalculation of remaining physical units and financial value after every transaction.
+- **Data Export**: Built-in support for CSV and spreadsheet statement exports.
+
+### 8. Security & Authentication
+- **Route**: `/login`
+- **Enterprise Design**: Clean, branded authentication interface matching the `#157347` forest-green identity.
+- **Feedback Alerts**: Support for dynamic error and success messages via EJS.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Server / Runtime** | [Node.js](https://nodejs.org/) (v18+) | Server-side execution environment |
+| **Web Framework** | [Express.js](https://expressjs.com/) (v4.21+) | HTTP routing, middleware, and request handling |
+| **Templating Engine** | [EJS](https://ejs.co/) (v3.1+) | Server-side rendered dynamic HTML templates |
+| **CSS Framework** | [Bootstrap 5.3.3](https://getbootstrap.com/) | Responsive UI grid and utility components |
+| **Custom Styling** | Vanilla CSS (`style.css`) | Design tokens, color system, and layout drawer |
+| **Icons** | [Bootstrap Icons v1.11](https://icons.getbootstrap.com/) | Enterprise UI iconography |
+| **Typography** | [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans) | Modern geometric typography |
+| **Charts & Graphs** | [Chart.js](https://www.chartjs.org/) | Interactive canvas-based data visualizations |
+
+---
+
+## 📂 Repository Structure
+
+```text
+Stock-Sense/
+│
+├── front-end/
+│   ├── public/
+│   │   └── css/
+│   │       └── style.css            # Global design tokens, layout, and component styles
+│   │
+│   ├── views/
+│   │   ├── partials/
+│   │   │   ├── navbar.ejs           # Header with global search (Ctrl+K), live sync, and alerts
+│   │   │   ├── sidebar.ejs          # Collapsible navigation drawer with warehouse selector
+│   │   │   └── footer.ejs           # System status footer, keyboard shortcuts modal, and JS bundles
+│   │   │
+│   │   ├── dashboard.ejs            # High-level analytics, operational pipelines, and charts
+│   │   ├── products.ejs             # Product catalog, stock filters, and creation modal
+│   │   ├── receipts.ejs             # Inbound purchase order receipts (WH/IN)
+│   │   ├── deliveries.ejs           # Outbound sales delivery orders (WH/OUT)
+│   │   ├── transfers.ejs            # Internal warehouse relocation (WH/INT)
+│   │   ├── adjustments.ejs          # Physical cycle count reconciliation (INV/ADJ)
+│   │   ├── ledger.ejs               # Chronological transaction ledger and valuation
+│   │   └── login.ejs                # Authentication view
+│   │
+│   └── login.html                   # Static HTML login template
+│
+├── .gitignore                       # Standard rules for node_modules and system files
+├── package.json                     # Project manifest and production dependencies
+├── package-lock.json                 # Dependency lockfile
+├── server.js                        # Main Express application entry point
+└── README.md                        # Project documentation
+```
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to set up and run StockSense locally on your machine.
 
 ### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed (v18.x or later recommended).
+- **Node.js**: `v18.0.0` or higher installed ([Download Node.js](https://nodejs.org/))
+- **npm**: `v9.0.0` or higher (comes bundled with Node.js)
+- **Git**: Installed and configured ([Download Git](https://git-scm.com/))
 
 ### 1. Clone the Repository
 ```bash
@@ -112,57 +212,94 @@ cd Stock-Sense
 npm install
 ```
 
-### 3. Run the Development Server
+### 3. Launch the Application
 ```bash
 npm start
 ```
-*Or with automatic file reload:*
+*For active development with automatic file watching:*
 ```bash
 npm run dev
 ```
 
-### 4. Open in Browser
-Visit **[http://localhost:3000](http://localhost:3000)** to explore the system.
+### 4. Access the Application
+Open your browser and navigate to:
+```
+http://localhost:3000
+```
+*(The root `/` path will automatically redirect you to the main `/dashboard`).*
 
 ---
 
-## 🗺️ Application Routes
+## 🗺️ API & Route Reference
 
-| Endpoint | Method | View Rendered | Purpose |
-| :--- | :---: | :--- | :--- |
-| `/` | `GET` | — | Redirects to `/dashboard` |
-| `/login` | `GET` / `POST` | `login.ejs` | User login and authentication |
-| `/dashboard` | `GET` | `dashboard.ejs` | Warehouse analytics, metrics & charts |
-| `/products` | `GET` / `POST` | `products.ejs` | Product catalog & new item creation |
-| `/receipts` | `GET` / `POST` | `receipts.ejs` | Inbound receiving operations |
-| `/deliveries` | `GET` / `POST` | `deliveries.ejs` | Outbound packing & dispatch |
-| `/transfers` | `GET` / `POST` | `transfers.ejs` | Inter-location stock transfers |
-| `/adjustments`| `GET` / `POST` | `adjustments.ejs`| Physical stock takes & variance reconciliation |
-| `/ledger` | `GET` | `ledger.ejs` | Chronological transaction audit trail |
+| HTTP Method | Route | Associated View | Description |
+| :---: | :--- | :--- | :--- |
+| `GET` | `/` | — | Automatically redirects to `/dashboard` |
+| `GET` | `/login` | `login.ejs` | Displays authentication form |
+| `POST` | `/login` | — | Authenticates credentials and starts session |
+| `GET` | `/dashboard` | `dashboard.ejs` | Warehouse analytics, operational pipelines & charts |
+| `GET` | `/products` | `products.ejs` | Product catalog with live search & filters |
+| `POST` | `/products` | — | Creates and registers a new product SKU |
+| `GET` | `/receipts` | `receipts.ejs` | Inbound receiving operations and vendor tracking |
+| `POST` | `/receipts` | — | Registers a new inbound shipment order |
+| `GET` | `/deliveries`| `deliveries.ejs`| Outbound dispatch management and carrier tracking |
+| `POST` | `/deliveries`| — | Registers a new customer delivery order |
+| `GET` | `/transfers` | `transfers.ejs` | Internal warehouse bin relocations |
+| `POST` | `/transfers` | — | Dispatches a new internal stock transfer |
+| `GET` | `/adjustments`| `adjustments.ejs`| Physical cycle count reconciliation |
+| `POST` | `/adjustments`| — | Submits stock discrepancy for management review |
+| `GET` | `/ledger` | `ledger.ejs` | Comprehensive chronological audit trail & valuation |
 
 ---
 
-## ⌨️ Built-in Keyboard Shortcuts
+## ⌨️ Keyboard Shortcuts
 
-| Shortcut | Action |
+StockSense includes built-in keyboard accelerators for rapid warehouse navigation:
+
+| Key Binding | Function |
 | :--- | :--- |
-| <kbd>Ctrl</kbd> + <kbd>K</kbd> | Focus global inventory search bar |
-| <kbd>Ctrl</kbd> + <kbd>B</kbd> | Toggle navigation sidebar |
+| <kbd>Ctrl</kbd> + <kbd>K</kbd> | Instantly focus the global inventory search input |
+| <kbd>Ctrl</kbd> + <kbd>B</kbd> | Toggle the left navigation sidebar |
 
 ---
 
-## 🤝 Contributing & Git Workflow
+## 🔮 Development Roadmap
 
-1. Create a feature branch:
+- [x] **Phase 1: UI/UX & Templating**
+  - Implement cohesive design system based on `#157347` enterprise brand identity.
+  - Build responsive EJS views for all 7 warehouse operations.
+  - Implement Chart.js visual analytics and modals.
+- [ ] **Phase 2: Database Persistence & ORM**
+  - Connect database (PostgreSQL with Prisma / MongoDB with Mongoose).
+  - Define relational schemas for Products, Locations, Partners, and StockMoves.
+- [ ] **Phase 3: Production Authentication & Roles**
+  - Implement `bcrypt` password encryption and session management.
+  - Role-Based Access Control (Admin, Warehouse Manager, Receiving Clerk, Auditor).
+- [ ] **Phase 4: Barcode & Label Generation**
+  - Real-time barcode scanning integration (Code 128 / QR codes).
+  - Automated PDF generation for Packing Slips and Delivery Waybills.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from team members! Please follow standard Git feature branching:
+
+1. **Pull the latest changes from `main`**:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+2. **Create a descriptive feature branch**:
    ```bash
    git checkout -b feature/your-feature-name
    ```
-2. Commit your changes:
+3. **Commit your modifications using conventional commits**:
    ```bash
-   git commit -m "feat: description of changes"
+   git commit -m "feat(module): description of changes"
    ```
-3. Push to your remote branch:
+4. **Push the branch to GitHub**:
    ```bash
-   git push origin feature/your-feature-name
+   git push -u origin feature/your-feature-name
    ```
-4. Open a **Pull Request** for team review.
+5. **Open a Pull Request** against `main` for review and merging.
