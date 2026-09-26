@@ -1,0 +1,107 @@
+<% 
+  const current = typeof activePage !== 'undefined' ? activePage : '';
+%>
+<!-- Sidebar -->
+<aside class="app-sidebar shadow-sm" id="sidebarNav">
+  <!-- Brand Header -->
+  <div class="sidebar-header d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
+    <a href="/dashboard" class="d-flex align-items-center text-decoration-none">
+      <div class="brand-icon bg-success-subtle text-success p-2 rounded-3 me-2 d-flex align-items-center justify-content-center">
+        <i class="bi bi-boxes fs-5"></i>
+      </div>
+      <div>
+        <span class="fs-5 fw-bold text-dark tracking-tight">Stock<span class="text-success">Sense</span></span>
+        <span class="badge bg-secondary-subtle text-secondary-emphasis ms-1 font-monospace" style="font-size: 0.65rem;">IMS v1.2</span>
+      </div>
+    </a>
+    <button class="btn btn-sm btn-light d-lg-none" id="sidebarCloseBtn" type="button" aria-label="Close sidebar">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Warehouse Context Selector -->
+  <div class="px-3 pt-3 pb-2">
+    <div class="dropdown">
+      <button class="btn btn-light btn-sm w-100 text-start d-flex align-items-center justify-content-between border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 0.82rem;">
+        <span class="d-flex align-items-center text-truncate">
+          <i class="bi bi-geo-alt-fill text-success me-2"></i>
+          <span class="fw-medium text-dark text-truncate">Central Warehouse (WH-01)</span>
+        </span>
+        <i class="bi bi-chevron-down text-muted small ms-1"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end w-100 shadow-sm border-0" style="font-size: 0.85rem;">
+        <li><h6 class="dropdown-header text-uppercase small">Select Warehouse</h6></li>
+        <li><a class="dropdown-item active d-flex justify-content-between align-items-center" href="#"><span class="text-truncate">Central Warehouse (WH-01)</span> <i class="bi bi-check2"></i></a></li>
+        <li><a class="dropdown-item d-flex justify-content-between align-items-center" href="#"><span class="text-truncate">East Coast Hub (WH-02)</span></a></li>
+        <li><a class="dropdown-item d-flex justify-content-between align-items-center" href="#"><span class="text-truncate">Assembly & Packaging (WH-03)</span></a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-muted small" href="#"><i class="bi bi-plus-circle me-1"></i> Manage Locations</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Navigation Links -->
+  <div class="sidebar-body flex-grow-1 overflow-y-auto px-2 py-2">
+    <div class="sidebar-section-title px-3 pt-2 pb-1 text-uppercase text-muted fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Overview</div>
+    
+    <a href="/dashboard" class="sidebar-link <%= current === 'dashboard' ? 'active' : '' %>">
+      <i class="bi bi-grid-1x2-fill"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="/products" class="sidebar-link <%= current === 'products' ? 'active' : '' %>">
+      <i class="bi bi-box-seam-fill"></i>
+      <span class="flex-grow-1">Products</span>
+      <span class="badge bg-success-subtle text-success rounded-pill px-2">1,420</span>
+    </a>
+
+    <div class="sidebar-section-title px-3 pt-3 pb-1 text-uppercase text-muted fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Operations</div>
+    
+    <a href="/receipts" class="sidebar-link <%= current === 'receipts' ? 'active' : '' %>">
+      <i class="bi bi-arrow-down-left-square-fill"></i>
+      <span class="flex-grow-1">Receipts</span>
+      <span class="badge bg-primary-subtle text-primary rounded-pill px-2">8</span>
+    </a>
+
+    <a href="/deliveries" class="sidebar-link <%= current === 'deliveries' ? 'active' : '' %>">
+      <i class="bi bi-arrow-up-right-square-fill"></i>
+      <span class="flex-grow-1">Deliveries</span>
+      <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2">5</span>
+    </a>
+
+    <a href="/transfers" class="sidebar-link <%= current === 'transfers' ? 'active' : '' %>">
+      <i class="bi bi-arrow-left-right"></i>
+      <span>Internal Transfers</span>
+    </a>
+
+    <a href="/adjustments" class="sidebar-link <%= current === 'adjustments' ? 'active' : '' %>">
+      <i class="bi bi-sliders2-vertical"></i>
+      <span>Stock Adjustments</span>
+    </a>
+
+    <div class="sidebar-section-title px-3 pt-3 pb-1 text-uppercase text-muted fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Auditing & Reporting</div>
+
+    <a href="/ledger" class="sidebar-link <%= current === 'ledger' ? 'active' : '' %>">
+      <i class="bi bi-journal-bookmark-fill"></i>
+      <span>Stock Ledger</span>
+    </a>
+  </div>
+
+  <!-- User / Footer Bar in Sidebar -->
+  <div class="sidebar-footer p-3 border-top mt-auto bg-light-subtle">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center min-w-0">
+        <div class="avatar-circle bg-success text-white fw-bold me-2 flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content-center; font-size: 0.85rem;">
+          AS
+        </div>
+        <div class="min-w-0">
+          <div class="fw-semibold text-dark text-truncate" style="font-size: 0.85rem;">Alex Smith</div>
+          <div class="text-muted small text-truncate" style="font-size: 0.75rem;">Inventory Lead</div>
+        </div>
+      </div>
+      <a href="/login" class="btn btn-sm btn-outline-danger border-0 p-1 px-2" title="Sign out" aria-label="Sign out">
+        <i class="bi bi-box-arrow-right fs-6"></i>
+      </a>
+    </div>
+  </div>
+</aside>
