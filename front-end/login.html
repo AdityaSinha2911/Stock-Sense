@@ -120,7 +120,9 @@
 					showAlert(`Success! Welcome ${data.user.name} (${data.user.role}). Redirecting...`, 'success');
 					localStorage.setItem('stocksense_token', data.token);
 					localStorage.setItem('stocksense_user', JSON.stringify(data.user));
-					// In production or next step: redirect to dashboard
+					setTimeout(() => {
+						window.location.href = 'dashboard.html';
+					}, 700);
 				} else {
 					showAlert(data.message || 'Login failed. Please check your credentials.');
 				}
