@@ -1,4 +1,4 @@
-# StockSense – Frontend
+# StockSense 
 
 StockSense is an Odoo-style Inventory Management System frontend designed for managing products, receipts, deliveries, internal stock transfers, inventory adjustments, dashboard analytics, and stock ledger information.
 
