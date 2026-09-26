@@ -117,12 +117,13 @@ const login = async (req, res) => {
         }
 
         // Generate JWT
+        const secret = process.env.JWT_SECRET || "stocksense_jwt_secret_key_2026";
         const token = jwt.sign(
             {
                 userId: user.id,
                 role: user.role
             },
-            process.env.JWT_SECRET,
+            secret,
             {
                 expiresIn: "1d"
             }

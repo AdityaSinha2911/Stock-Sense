@@ -194,8 +194,9 @@ const validateExistingOperation = (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid operation ID" });
         }
 
-        // Only manager can validate
-        if (req.user.role !== "manager") {
+        // Manager/Admin can validate
+        const allowedManagers = ["manager", "Warehouse Admin", "Inventory Lead", "admin", "Admin"];
+        if (!allowedManagers.includes(req.user.role)) {
             return res.status(403).json({
                 success: false,
                 message:
@@ -208,6 +209,16 @@ const validateExistingOperation = (req, res) => {
                 req.params.id,
                 req.user.userId
             );
+
+        if (req.accepts("html") && !req.is("json")) {
+            const redirectMap = {
+                RECEIPT: "/receipts",
+                DELIVERY: "/deliveries",
+                TRANSFER: "/transfers",
+                ADJUSTMENT: "/adjustments"
+            };
+            return res.redirect(redirectMap[operation.type] || "/dashboard");
+        }
 
         res.status(200).json({
             success: true,
@@ -222,6 +233,10 @@ const validateExistingOperation = (req, res) => {
             "Validate operation error:",
             error
         );
+
+        if (req.accepts("html") && !req.is("json")) {
+            return res.redirect(`/dashboard?error=${encodeURIComponent(error.message || "Validation failed")}`);
+        }
 
         const status = /not found/i.test(error.message || "") ? 404 : 400;
         return res.status(status).json({

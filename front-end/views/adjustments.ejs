@@ -239,9 +239,13 @@
                 <label class="form-label small fw-semibold">Target Product *</label>
                 <select class="form-select" id="adjProductSelect" name="product" required>
                   <option value="" disabled selected>Select Product to Reconcile</option>
-                  <option value="Stainless Steel Hex Bolt M8 (BOLT-SS-08)" data-stock="14" data-cost="0.45" data-loc="WH-01 / Zone A">Stainless Steel Hex Bolt M8 (14 on hand)</option>
-                  <option value="Lithium Iron Battery 48V (BAT-LFP-48100)" data-stock="42" data-cost="420.00" data-loc="WH-01 / Zone C">Lithium Iron Battery 48V (42 on hand)</option>
-                  <option value="Thermal Silicone Paste 50g (THM-SIL-50)" data-stock="6" data-cost="4.80" data-loc="WH-01 / Zone B">Thermal Silicone Paste 50g (6 on hand)</option>
+                  <% (typeof products !== 'undefined' && products && products.length ? products : [{ id: 1, name: 'Steel Rods', sku: 'STL-001', onHand: 100 }]).forEach(prod => { 
+                       const stockVal = prod.total_stock !== undefined ? prod.total_stock : (prod.onHand || 0);
+                  %>
+                    <option value="<%= prod.name %>" data-id="<%= prod.id %>" data-stock="<%= stockVal %>" data-loc="Main Warehouse">
+                      <%= prod.name %> (<%= prod.sku %>) - <%= stockVal %> on hand
+                    </option>
+                  <% }) %>
                 </select>
               </div>
               <div class="col-md-4">

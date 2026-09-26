@@ -188,9 +188,9 @@
                     <td class="text-end">
                       <div class="btn-group btn-group-sm">
                         <% if (r.status === 'ready') { %>
-                          <button class="btn btn-sm btn-success px-2 py-1" title="Validate and Receive Goods">
+                          <a href="/receipts/<%= r.id || r.ref %>/receive" class="btn btn-sm btn-success px-2 py-1 text-decoration-none" title="Validate and Receive Goods">
                             <i class="bi bi-check2-circle me-1"></i> Receive
-                          </button>
+                          </a>
                         <% } %>
                         <button class="btn btn-light border py-1 px-2" title="Print Goods Receipt Slip">
                           <i class="bi bi-printer text-secondary"></i>
@@ -237,30 +237,30 @@
             <div class="row g-3 mb-3">
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Supplier / Vendor *</label>
-                <select class="form-select" name="vendor" required>
-                  <option value="" disabled selected>Select Supplier</option>
-                  <option value="Acme Industrial Corp">Acme Industrial Corp</option>
-                  <option value="Apex Precision Metals">Apex Precision Metals</option>
-                  <option value="Global Electronics Ltd">Global Electronics Ltd</option>
-                  <option value="EcoPack Solutions">EcoPack Solutions</option>
-                </select>
+                <input type="text" class="form-control" name="vendor" list="vendorList" placeholder="e.g. Tata Steel" required>
+                <datalist id="vendorList">
+                  <option value="Tata Steel">
+                  <option value="Acme Industrial Corp">
+                  <option value="Apex Precision Metals">
+                  <option value="Global Electronics Ltd">
+                  <option value="EcoPack Solutions">
+                </datalist>
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Source Purchase Order # *</label>
-                <input type="text" class="form-control font-monospace" name="po" placeholder="PO-2026-901" required>
+                <input type="text" class="form-control font-monospace" name="po" placeholder="PO-2026-901" value="PO-2026-901" required>
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Destination Location *</label>
                 <select class="form-select" name="destination" required>
-                  <option value="WH-01 / Receiving Bay 2">Central WH (WH-01) - Bay 2</option>
-                  <option value="WH-01 / Zone A">Central WH (WH-01) - Zone A</option>
-                  <option value="WH-02 / Receiving">East Coast Hub (WH-02) - Receiving</option>
-                  <option value="WH-03 / Packaging">Packaging Plant (WH-03)</option>
+                  <% (typeof locations !== 'undefined' && locations && locations.length ? locations : [{ name: 'Main Warehouse' }, { name: 'Production Rack' }, { name: 'Warehouse 2' }]).forEach(loc => { %>
+                    <option value="<%= loc.name %>"><%= loc.name %></option>
+                  <% }) %>
                 </select>
               </div>
               <div class="col-md-6">
-                <label class="form-label small fw-semibold">Scheduled Date *</label>
-                <input type="datetime-local" class="form-control" name="scheduledDate" required>
+                <label class="form-label small fw-semibold">Scheduled Date</label>
+                <input type="datetime-local" class="form-control" name="scheduledDate">
               </div>
             </div>
 
@@ -278,14 +278,14 @@
                 <tbody>
                   <tr>
                     <td>
-                      <select class="form-select form-select-sm" name="product">
-                        <option>Stainless Steel Hex Bolt M8 (BOLT-SS-08)</option>
-                        <option>Lithium Iron Battery 48V (BAT-LFP-48100)</option>
-                        <option>Thermal Silicone Paste 50g (THM-SIL-50)</option>
+                      <select class="form-select form-select-sm" name="product" required>
+                        <% (typeof products !== 'undefined' && products && products.length ? products : [{ id: 1, name: 'Steel Rods', sku: 'STL-001' }]).forEach(prod => { %>
+                          <option value="<%= prod.name %>"><%= prod.name %> (<%= prod.sku %>)</option>
+                        <% }) %>
                       </select>
                     </td>
-                    <td><input type="number" class="form-control form-control-sm" placeholder="250" value="100"></td>
-                    <td><input type="number" step="0.01" class="form-control form-control-sm" placeholder="0.45" value="0.45"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="qty" placeholder="50" value="50" min="1" required></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" name="cost" placeholder="15.00" value="15.00"></td>
                     <td class="text-center"><button type="button" class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-trash"></i></button></td>
                   </tr>
                 </tbody>

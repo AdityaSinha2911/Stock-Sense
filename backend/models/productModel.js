@@ -13,6 +13,7 @@ const getAllProducts = () => {
             c.name AS category_name,
             p.unit,
             p.reorder_level,
+            COALESCE((SELECT SUM(quantity) FROM stock WHERE product_id = p.id), 0) AS total_stock,
             p.created_at,
             p.updated_at
         FROM products p
@@ -36,6 +37,7 @@ const getProductById = (id) => {
             c.name AS category_name,
             p.unit,
             p.reorder_level,
+            COALESCE((SELECT SUM(quantity) FROM stock WHERE product_id = p.id), 0) AS total_stock,
             p.created_at,
             p.updated_at
         FROM products p
@@ -54,7 +56,9 @@ const createProduct = (
     sku,
     categoryId,
     unit,
-    reorderLevel
+    reorderLevel,
+    initialStock = 0,
+    locationId = 1
 ) => {
 
     const result = db.prepare(`
@@ -74,7 +78,22 @@ const createProduct = (
         reorderLevel || 0
     );
 
-    return getProductById(result.lastInsertRowid);
+    const newProdId = result.lastInsertRowid;
+    if (initialStock && Number(initialStock) > 0) {
+        db.prepare(`
+            INSERT INTO stock (product_id, location_id, quantity)
+            VALUES (?, ?, ?)
+        `).run(newProdId, locationId || 1, Number(initialStock));
+
+        db.prepare(`
+            INSERT INTO stock_ledger (
+                product_id, location_id, movement_type, quantity_change,
+                previous_quantity, new_quantity, performed_by
+            ) VALUES (?, ?, 'INITIAL_STOCK', ?, 0, ?, 1)
+        `).run(newProdId, locationId || 1, Number(initialStock), Number(initialStock));
+    }
+
+    return getProductById(newProdId);
 };
 
 

@@ -189,9 +189,9 @@
                     <td class="text-end">
                       <div class="btn-group btn-group-sm">
                         <% if (d.status === 'ready') { %>
-                          <button class="btn btn-sm btn-success px-2 py-1" title="Validate and Dispatch">
+                          <a href="/deliveries/<%= d.id || d.ref %>/ship" class="btn btn-sm btn-success px-2 py-1 text-decoration-none" title="Validate and Dispatch">
                             <i class="bi bi-send-check me-1"></i> Ship
-                          </button>
+                          </a>
                         <% } %>
                         <button class="btn btn-light border py-1 px-2" title="Print Packing Slip">
                           <i class="bi bi-printer text-secondary"></i>
@@ -273,14 +273,14 @@
                 <tbody>
                   <tr>
                     <td>
-                      <select class="form-select form-select-sm" name="product">
-                        <option>Lithium Iron Battery 48V (BAT-LFP-48100)</option>
-                        <option>Aluminum Heatsink 120mm (HSK-ALU-120)</option>
-                        <option>Stainless Steel Hex Bolt M8 (BOLT-SS-08)</option>
+                      <select class="form-select form-select-sm" name="product" required>
+                        <% (typeof products !== 'undefined' && products && products.length ? products : [{ id: 1, name: 'Steel Rods', sku: 'STL-001' }]).forEach(prod => { %>
+                          <option value="<%= prod.name %>"><%= prod.name %> (<%= prod.sku %>)</option>
+                        <% }) %>
                       </select>
                     </td>
-                    <td><input type="number" class="form-control form-control-sm" placeholder="10" value="4"></td>
-                    <td><span class="badge bg-success-subtle text-success">42 Available</span></td>
+                    <td><input type="number" class="form-control form-control-sm" name="qty" placeholder="20" value="20" min="1" required></td>
+                    <td><span class="badge bg-success-subtle text-success">In Stock</span></td>
                     <td class="text-center"><button type="button" class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-trash"></i></button></td>
                   </tr>
                 </tbody>

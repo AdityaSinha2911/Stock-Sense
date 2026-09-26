@@ -195,9 +195,9 @@
                     <td class="text-end">
                       <div class="btn-group btn-group-sm">
                         <% if (t.status === 'in_transit' || t.status === 'scheduled') { %>
-                          <button class="btn btn-sm btn-success px-2 py-1" title="Confirm Receipt at Destination">
+                          <a href="/transfers/<%= t.id || t.ref %>/complete" class="btn btn-sm btn-success px-2 py-1 text-decoration-none" title="Confirm Receipt at Destination">
                             <i class="bi bi-check2 me-1"></i> Complete
-                          </button>
+                          </a>
                         <% } %>
                         <button class="btn btn-light border py-1 px-2" title="Print Transfer Slip">
                           <i class="bi bi-printer text-secondary"></i>
@@ -240,29 +240,25 @@
               <div class="col-md-12">
                 <label class="form-label small fw-semibold">Select Product to Move *</label>
                 <select class="form-select" name="product" required>
-                  <option value="" disabled selected>Choose Item</option>
-                  <option value="Aluminum Heatsink 120mm (HSK-ALU-120)">Aluminum Heatsink 120mm (HSK-ALU-120) - 180 available</option>
-                  <option value="Stainless Steel Hex Bolt M8 (BOLT-SS-08)">Stainless Steel Hex Bolt M8 (BOLT-SS-08) - 14 available</option>
-                  <option value="Lithium Iron Battery 48V (BAT-LFP-48100)">Lithium Iron Battery 48V (BAT-LFP-48100) - 42 available</option>
-                  <option value="Copper Wiring Reel 100m (WIR-CPR-100)">Copper Wiring Reel 100m (WIR-CPR-100) - 65 available</option>
+                  <% (typeof products !== 'undefined' && products && products.length ? products : [{ id: 1, name: 'Steel Rods', sku: 'STL-001', onHand: 100 }]).forEach(prod => { %>
+                    <option value="<%= prod.name %>"><%= prod.name %> (<%= prod.sku %>) - <%= prod.total_stock !== undefined ? prod.total_stock : (prod.onHand || 0) %> available</option>
+                  <% }) %>
                 </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Source Location (From) *</label>
                 <select class="form-select" name="fromLocation" required>
-                  <option value="WH-01 / Zone A / Rack-02">WH-01 / Zone A / Rack-02</option>
-                  <option value="WH-01 / Bulk Storage">WH-01 / Bulk Storage</option>
-                  <option value="WH-01 / Receiving Bay 2">WH-01 / Receiving Bay 2</option>
-                  <option value="WH-02 / Wire-Bay">WH-02 / Wire-Bay</option>
+                  <% (typeof locations !== 'undefined' && locations && locations.length ? locations : [{ name: 'Main Warehouse' }, { name: 'Production Rack' }]).forEach((loc, idx) => { %>
+                    <option value="<%= loc.name %>" <%= idx === 0 ? 'selected' : '' %>><%= loc.name %></option>
+                  <% }) %>
                 </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label small fw-semibold">Destination Location (To) *</label>
                 <select class="form-select" name="toLocation" required>
-                  <option value="WH-01 / Zone C / Bin-14">WH-01 / Zone C / Bin-14</option>
-                  <option value="WH-01 / Pack Station 3">WH-01 / Pack Station 3</option>
-                  <option value="WH-03 / Packaging">WH-03 / Packaging</option>
-                  <option value="WH-01 / Outbound Staging">WH-01 / Outbound Staging</option>
+                  <% (typeof locations !== 'undefined' && locations && locations.length ? locations : [{ name: 'Main Warehouse' }, { name: 'Production Rack' }]).forEach((loc, idx) => { %>
+                    <option value="<%= loc.name %>" <%= idx === 1 ? 'selected' : '' %>><%= loc.name %></option>
+                  <% }) %>
                 </select>
               </div>
               <div class="col-md-4">

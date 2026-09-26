@@ -1,8 +1,8 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-// Path to the SQLite database file inside the DB directory
-const dbPath = path.join(__dirname, 'stocksense.db');
+// Path to the SQLite database file inside backend/database directory
+const dbPath = path.join(__dirname, '../backend/database/stocksense.db');
 
 // Create or open the SQLite database
 const db = new Database(dbPath);

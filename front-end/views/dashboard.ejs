@@ -144,9 +144,9 @@
                 <span class="text-muted small fw-medium">Inventory Valuation</span>
                 <span class="badge bg-success-subtle text-success small"><i class="bi bi-arrow-up-right me-1"></i>+8.4%</span>
               </div>
-              <div class="h3 fw-bold text-dark mb-1">$284,520</div>
+              <div class="h3 fw-bold text-dark mb-1">$<%= typeof totalValuation !== 'undefined' ? totalValuation : '284,520' %></div>
               <div class="small text-muted d-flex align-items-center gap-1">
-                <i class="bi bi-boxes text-success"></i> 14,850 Total Units in Stock
+                <i class="bi bi-boxes text-success"></i> <%= (typeof products !== 'undefined' && products) ? products.reduce((acc, p) => acc + (p.onHand || 0), 0) : 14850 %> Total Units in Stock
               </div>
             </div>
           </div>
@@ -156,11 +156,11 @@
             <div class="ss-card kpi-card kpi-blue p-3">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="text-muted small fw-medium">Catalog Items</span>
-                <span class="badge bg-danger-subtle text-danger small"><i class="bi bi-exclamation-circle me-1"></i>18 Low Stock</span>
+                <span class="badge bg-danger-subtle text-danger small"><i class="bi bi-exclamation-circle me-1"></i><%= typeof lowStockCount !== 'undefined' ? lowStockCount : 1 %> Low Stock</span>
               </div>
-              <div class="h3 fw-bold text-dark mb-1">1,420</div>
+              <div class="h3 fw-bold text-dark mb-1"><%= typeof activeSKUs !== 'undefined' ? activeSKUs : 1420 %></div>
               <div class="small text-muted d-flex align-items-center gap-1">
-                <i class="bi bi-tag text-primary"></i> Across 12 Product Categories
+                <i class="bi bi-tag text-primary"></i> Across Multiple Categories
               </div>
             </div>
           </div>
@@ -170,11 +170,11 @@
             <div class="ss-card kpi-card kpi-amber p-3">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="text-muted small fw-medium">Incoming Receipts</span>
-                <span class="badge bg-warning-subtle text-warning-emphasis small">8 Arriving Today</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis small">Ready to Receive</span>
               </div>
-              <div class="h3 fw-bold text-dark mb-1">14 Orders</div>
+              <div class="h3 fw-bold text-dark mb-1"><%= typeof pendingReceipts !== 'undefined' ? pendingReceipts : 8 %> Orders</div>
               <div class="small text-muted d-flex align-items-center gap-1">
-                <i class="bi bi-truck text-warning-emphasis"></i> $42,600 Expected Value
+                <i class="bi bi-truck text-warning-emphasis"></i> Active Pipeline
               </div>
             </div>
           </div>
@@ -184,11 +184,11 @@
             <div class="ss-card kpi-card kpi-purple p-3">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="text-muted small fw-medium">Outgoing Deliveries</span>
-                <span class="badge bg-primary-subtle text-primary small">9 Ready to Dispatch</span>
+                <span class="badge bg-primary-subtle text-primary small">Ready to Dispatch</span>
               </div>
-              <div class="h3 fw-bold text-dark mb-1">22 Shipments</div>
+              <div class="h3 fw-bold text-dark mb-1"><%= typeof pendingDeliveries !== 'undefined' ? pendingDeliveries : 5 %> Shipments</div>
               <div class="small text-muted d-flex align-items-center gap-1">
-                <i class="bi bi-box-arrow-up-right text-purple"></i> 7 Waiting for Stock
+                <i class="bi bi-box-arrow-up-right text-purple"></i> Customer Orders
               </div>
             </div>
           </div>
@@ -373,46 +373,26 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td class="fw-semibold text-dark">Stainless Steel Hex Bolt M8</td>
-                      <td><span class="font-monospace text-muted small">BOLT-SS-08</span></td>
-                      <td>WH-01 / Zone A</td>
-                      <td class="text-center"><span class="badge bg-danger text-white">14 pcs</span></td>
-                      <td class="text-center text-muted">50 pcs</td>
-                      <td class="text-end">
-                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="fw-semibold text-dark">Thermal Silicone Paste 50g</td>
-                      <td><span class="font-monospace text-muted small">THM-SIL-50</span></td>
-                      <td>WH-01 / Zone B</td>
-                      <td class="text-center"><span class="badge bg-danger text-white">6 tubes</span></td>
-                      <td class="text-center text-muted">25 tubes</td>
-                      <td class="text-end">
-                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="fw-semibold text-dark">Microcontroller ATmega328P</td>
-                      <td><span class="font-monospace text-muted small">MCU-ATM-328</span></td>
-                      <td>WH-01 / Rack 04</td>
-                      <td class="text-center"><span class="badge bg-warning text-dark">28 units</span></td>
-                      <td class="text-center text-muted">100 units</td>
-                      <td class="text-end">
-                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="fw-semibold text-dark">Cardboard Shipping Box 12x12</td>
-                      <td><span class="font-monospace text-muted small">BOX-CRD-12</span></td>
-                      <td>WH-03 / Packaging</td>
-                      <td class="text-center"><span class="badge bg-warning text-dark">45 units</span></td>
-                      <td class="text-center text-muted">150 units</td>
-                      <td class="text-end">
-                        <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2" style="font-size: 0.75rem;">Reorder</a>
-                      </td>
-                    </tr>
+                    <% 
+                      const lowStockItems = (typeof products !== 'undefined' && products)
+                        ? products.filter(p => (p.onHand || 0) <= (p.minAlert || 10))
+                        : [];
+                      const displayLowStock = lowStockItems.length ? lowStockItems : [
+                        { name: 'Copper Wire', sku: 'CPW-501', location: 'Main Warehouse', onHand: 8, minAlert: 15, uom: 'rolls' }
+                      ];
+                    %>
+                    <% displayLowStock.forEach(item => { %>
+                      <tr>
+                        <td class="fw-semibold text-dark"><%= item.name %></td>
+                        <td><span class="font-monospace text-muted small"><%= item.sku %></span></td>
+                        <td><%= item.location || 'Main Warehouse' %></td>
+                        <td class="text-center"><span class="badge bg-danger text-white"><%= item.onHand %> <%= item.uom || 'units' %></span></td>
+                        <td class="text-center text-muted"><%= item.minAlert %> <%= item.uom || 'units' %></td>
+                        <td class="text-end">
+                          <a href="/receipts" class="btn btn-sm btn-ss-primary py-1 px-2 text-white bg-success text-decoration-none" style="font-size: 0.75rem; border-radius: 6px;">Reorder</a>
+                        </td>
+                      </tr>
+                    <% }) %>
                   </tbody>
                 </table>
               </div>
@@ -427,46 +407,25 @@
                 <a href="/ledger" class="text-success small fw-medium text-decoration-none">Full Ledger &rarr;</a>
               </div>
               <div class="list-group list-group-flush">
-                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-success-subtle text-success p-2 rounded-circle"><i class="bi bi-box-arrow-in-down"></i></span>
-                    <div>
-                      <div class="fw-semibold text-dark small">WH/IN/00104 &bull; Received</div>
-                      <div class="text-muted" style="font-size: 0.75rem;">+250 Steel Flanges from Acme</div>
+                <% 
+                  const recentMoves = (typeof ledger !== 'undefined' && ledger && ledger.length) ? ledger.slice(0, 5) : [];
+                %>
+                <% if (recentMoves.length) { %>
+                  <% recentMoves.forEach(entry => { %>
+                    <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success-subtle text-success p-2 rounded-circle"><i class="bi bi-arrow-left-right"></i></span>
+                        <div>
+                          <div class="fw-semibold text-dark small"><%= entry.movement_type || entry.type || 'Movement' %> &bull; <%= entry.product_name || entry.product || 'Product' %></div>
+                          <div class="text-muted" style="font-size: 0.75rem;"><%= entry.quantity_change > 0 ? '+' : '' %><%= entry.quantity_change %> units &bull; <%= entry.location_name || 'Warehouse' %></div>
+                        </div>
+                      </div>
+                      <span class="badge-status badge-done">Done</span>
                     </div>
-                  </div>
-                  <span class="badge-status badge-done">Done</span>
-                </div>
-                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-warning-subtle text-warning-emphasis p-2 rounded-circle"><i class="bi bi-box-arrow-up-right"></i></span>
-                    <div>
-                      <div class="fw-semibold text-dark small">WH/OUT/00248 &bull; Dispatch</div>
-                      <div class="text-muted" style="font-size: 0.75rem;">-120 Lithium Battery Packs</div>
-                    </div>
-                  </div>
-                  <span class="badge-status badge-ready">Ready</span>
-                </div>
-                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-info-subtle text-info-emphasis p-2 rounded-circle"><i class="bi bi-arrow-left-right"></i></span>
-                    <div>
-                      <div class="fw-semibold text-dark small">WH/INT/00085 &bull; Transfer</div>
-                      <div class="text-muted" style="font-size: 0.75rem;">Zone A &rarr; Zone C (50 units)</div>
-                    </div>
-                  </div>
-                  <span class="badge-status badge-in-transit">In Transit</span>
-                </div>
-                <div class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary-subtle text-secondary-emphasis p-2 rounded-circle"><i class="bi bi-sliders"></i></span>
-                    <div>
-                      <div class="fw-semibold text-dark small">INV/ADJ/00031 &bull; Cycle Count</div>
-                      <div class="text-muted" style="font-size: 0.75rem;">Reconciled discrepancy (+4)</div>
-                    </div>
-                  </div>
-                  <span class="badge-status badge-done">Applied</span>
-                </div>
+                  <% }) %>
+                <% } else { %>
+                  <div class="p-3 text-center text-muted small">No recent movements recorded</div>
+                <% } %>
               </div>
             </div>
           </div>

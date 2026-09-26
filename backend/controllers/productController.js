@@ -87,25 +87,43 @@ const getProduct = (req, res) => {
 // ================================
 const createNewProduct = (req, res) => {
     try {
-        const {
+        let {
             name,
             sku,
             categoryId,
+            category,
             unit,
-            reorderLevel
+            uom,
+            reorderLevel,
+            minAlert,
+            initialStock,
+            stock,
+            locationId
         } = req.body;
 
+        unit = unit || uom || "pcs";
+        const parsedReorder = reorderLevel !== undefined ? Number(reorderLevel) : (minAlert !== undefined ? Number(minAlert) : 0);
+        const parsedStock = initialStock !== undefined ? Number(initialStock) : (stock !== undefined ? Number(stock) : 0);
+
+        // Resolve category if string name given
+        if (!categoryId && category) {
+            let cat = db.prepare("SELECT id FROM categories WHERE name = ? COLLATE NOCASE").get(category);
+            if (!cat) {
+                const info = db.prepare("INSERT INTO categories (name) VALUES (?)").run(category);
+                categoryId = info.lastInsertRowid;
+            } else {
+                categoryId = cat.id;
+            }
+        }
+
         if (!name || !sku || !unit) {
+            if (req.accepts("html") && !req.is("json")) {
+                return res.redirect("/products?error=Name+and+SKU+are+required");
+            }
             return res.status(400).json({
                 success: false,
                 message: "Name, SKU and unit are required"
             });
-        }
-
-        const validationError = validateProductInput({ categoryId, reorderLevel });
-        if (validationError) {
-            return res.status(validationError === "Category not found" ? 404 : 400)
-                .json({ success: false, message: validationError });
         }
 
         const existingProduct = getAllProducts()
@@ -115,6 +133,9 @@ const createNewProduct = (req, res) => {
             );
 
         if (existingProduct) {
+            if (req.accepts("html") && !req.is("json")) {
+                return res.redirect("/products?error=SKU+already+exists");
+            }
             return res.status(409).json({
                 success: false,
                 message: "SKU already exists"
@@ -126,8 +147,14 @@ const createNewProduct = (req, res) => {
             sku,
             categoryId,
             unit,
-            reorderLevel
+            parsedReorder,
+            parsedStock,
+            locationId || 1
         );
+
+        if (req.accepts("html") && !req.is("json")) {
+            return res.redirect("/products");
+        }
 
         res.status(201).json({
             success: true,
@@ -139,7 +166,14 @@ const createNewProduct = (req, res) => {
         console.error("Create product error:", error);
 
         if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+            if (req.accepts("html") && !req.is("json")) {
+                return res.redirect("/products?error=SKU+already+exists");
+            }
             return res.status(409).json({ success: false, message: "SKU already exists" });
+        }
+
+        if (req.accepts("html") && !req.is("json")) {
+            return res.redirect("/products?error=Server+error");
         }
 
         res.status(500).json({
