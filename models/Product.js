@@ -165,7 +165,10 @@ productSchema.pre('save', function (next) {
  * Dynamically computes total financial value of the on-hand inventory for this product.
  */
 productSchema.virtual('totalValue').get(function () {
-  return (this.quantityInStock * this.costPrice).toFixed(2);
+  if (this.quantityInStock !== undefined && this.costPrice !== undefined) {
+    return (this.quantityInStock * this.costPrice).toFixed(2);
+  }
+  return undefined;
 });
 
 module.exports = mongoose.model('Product', productSchema);

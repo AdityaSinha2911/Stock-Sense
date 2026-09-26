@@ -35,11 +35,11 @@ const {
   StockMovement
 } = require('../models');
 
+const connectDB = require('../config/db');
+
 const seedDatabase = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stocksense';
-    console.log(`[Seed] Connecting to MongoDB: ${mongoURI}`);
-    await mongoose.connect(mongoURI);
+    await connectDB();
     console.log('[Seed] Database connected successfully.');
 
     // ------------------------------------------------------------------------
