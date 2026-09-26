@@ -100,6 +100,32 @@ function requireAuth(req, res, next) {
   }
 }
 
+// Role-Based Access Control (RBAC) Guard Middleware
+function authorizeRoles(resourceName, ...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.redirect('/login');
+    }
+    const userRole = req.user.role || 'Warehouse Operator';
+
+    // Superuser: Warehouse Admin & Inventory Lead have unrestricted access to all modules
+    if (userRole === 'Warehouse Admin' || userRole === 'Inventory Lead' || userRole === 'Admin') {
+      return next();
+    }
+
+    if (allowedRoles.includes(userRole)) {
+      return next();
+    }
+
+    // Role is unauthorized -> Render 403 Access Denied
+    res.status(403).render('access-denied', {
+      userRole,
+      resourceName,
+      requiredRoles: ['Warehouse Admin', ...allowedRoles]
+    });
+  };
+}
+
 // Global user session helper
 app.use((req, res, next) => {
   if (req.cookies.stocksense_user) {
@@ -266,11 +292,11 @@ app.post('/products', requireAuth, (req, res) => {
 // ------------------------------------------
 // Inbound Receipts
 // ------------------------------------------
-app.get('/receipts', requireAuth, (req, res) => {
+app.get('/receipts', requireAuth, authorizeRoles('Inbound Receipts (WH/IN)', 'Receiving Clerk'), (req, res) => {
   res.render('receipts', { receipts, products });
 });
 
-app.post('/receipts', requireAuth, (req, res) => {
+app.post('/receipts', requireAuth, authorizeRoles('Inbound Receipts (WH/IN)', 'Receiving Clerk'), (req, res) => {
   const { vendor, po, destination, scheduledDate, product, qty, cost } = req.body;
   const refNum = 105 + receipts.length;
   const newReceipt = {
@@ -290,7 +316,7 @@ app.post('/receipts', requireAuth, (req, res) => {
 });
 
 // Validate & Receive Inbound Goods (increments product stock)
-app.get('/receipts/:ref/receive', requireAuth, (req, res) => {
+app.get('/receipts/:ref/receive', requireAuth, authorizeRoles('Inbound Receipts (WH/IN)', 'Receiving Clerk'), (req, res) => {
   const receipt = receipts.find(r => r.ref === req.params.ref);
   if (receipt && receipt.status !== 'done') {
     receipt.status = 'done';
@@ -327,11 +353,11 @@ app.get('/receipts/:ref/receive', requireAuth, (req, res) => {
 // ------------------------------------------
 // Outbound Deliveries
 // ------------------------------------------
-app.get('/deliveries', requireAuth, (req, res) => {
+app.get('/deliveries', requireAuth, authorizeRoles('Outbound Deliveries (WH/OUT)', 'Forklift Operator'), (req, res) => {
   res.render('deliveries', { deliveries, products });
 });
 
-app.post('/deliveries', requireAuth, (req, res) => {
+app.post('/deliveries', requireAuth, authorizeRoles('Outbound Deliveries (WH/OUT)', 'Forklift Operator'), (req, res) => {
   const { customer, so, carrier, scheduledDate, product, qty } = req.body;
   const refNum = 249 + deliveries.length;
   const newDelivery = {
@@ -351,7 +377,7 @@ app.post('/deliveries', requireAuth, (req, res) => {
 });
 
 // Validate & Ship Outbound Delivery (deducts product stock)
-app.get('/deliveries/:ref/ship', requireAuth, (req, res) => {
+app.get('/deliveries/:ref/ship', requireAuth, authorizeRoles('Outbound Deliveries (WH/OUT)', 'Forklift Operator'), (req, res) => {
   const delivery = deliveries.find(d => d.ref === req.params.ref);
   if (delivery && delivery.status !== 'done') {
     delivery.status = 'done';
@@ -390,11 +416,11 @@ app.get('/deliveries/:ref/ship', requireAuth, (req, res) => {
 // ------------------------------------------
 // Internal Transfers
 // ------------------------------------------
-app.get('/transfers', requireAuth, (req, res) => {
+app.get('/transfers', requireAuth, authorizeRoles('Internal Transfers (WH/INT)', 'Forklift Operator'), (req, res) => {
   res.render('transfers', { transfers, products });
 });
 
-app.post('/transfers', requireAuth, (req, res) => {
+app.post('/transfers', requireAuth, authorizeRoles('Internal Transfers (WH/INT)', 'Forklift Operator'), (req, res) => {
   const { product, fromLocation, toLocation, qty, operator, scheduledDate } = req.body;
   const refNum = 86 + transfers.length;
   const newTransfer = {
@@ -413,7 +439,7 @@ app.post('/transfers', requireAuth, (req, res) => {
   res.redirect('/transfers');
 });
 
-app.get('/transfers/:ref/complete', requireAuth, (req, res) => {
+app.get('/transfers/:ref/complete', requireAuth, authorizeRoles('Internal Transfers (WH/INT)', 'Forklift Operator'), (req, res) => {
   const transfer = transfers.find(t => t.ref === req.params.ref);
   if (transfer) {
     transfer.status = 'done';
@@ -438,11 +464,11 @@ app.get('/transfers/:ref/complete', requireAuth, (req, res) => {
 // ------------------------------------------
 // Stock Adjustments
 // ------------------------------------------
-app.get('/adjustments', requireAuth, (req, res) => {
+app.get('/adjustments', requireAuth, authorizeRoles('Inventory Adjustments (INV/ADJ)', 'Inventory Auditor'), (req, res) => {
   res.render('adjustments', { adjustments, products });
 });
 
-app.post('/adjustments', requireAuth, (req, res) => {
+app.post('/adjustments', requireAuth, authorizeRoles('Inventory Adjustments (INV/ADJ)', 'Inventory Auditor'), (req, res) => {
   const { product, countedStock, reason, auditor } = req.body;
   const counted = parseInt(countedStock) || 0;
   
@@ -501,7 +527,7 @@ app.post('/adjustments', requireAuth, (req, res) => {
 // ------------------------------------------
 // Stock Ledger
 // ------------------------------------------
-app.get('/ledger', requireAuth, (req, res) => {
+app.get('/ledger', requireAuth, authorizeRoles('Stock Ledger & Audit', 'Inventory Auditor'), (req, res) => {
   res.render('ledger', { ledger });
 });
 
