@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products | StockSense IMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --ss-primary: #157347;
+      --ss-primary-hover: #115c38;
+      --ss-primary-light: #e8f5e9;
+      --ss-card-border: #e1e8e5;
+      --ss-bg: #f4f7f6;
+      --ss-text-main: #1e293b;
+      --ss-text-muted: #64748b;
+      --ss-sidebar-width: 260px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--ss-bg); color: var(--ss-text-main); }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .app-sidebar { width: var(--ss-sidebar-width); flex-shrink: 0; background: #ffffff; border-right: 1px solid var(--ss-card-border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 1030; transition: transform 0.25s ease-in-out; }
+    .app-main { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; background-color: var(--ss-bg); }
+    .app-content { flex-grow: 1; padding: 1.75rem; }
+    .sidebar-link { display: flex; align-items: center; padding: 0.65rem 0.95rem; color: #475569; text-decoration: none; font-weight: 500; font-size: 0.88rem; border-radius: 8px; margin-bottom: 0.2rem; transition: all 0.15s ease; }
+    .sidebar-link:hover { background-color: #f1f5f9; color: var(--ss-primary); }
+    .sidebar-link.active { background-color: var(--ss-primary-light); color: var(--ss-primary); font-weight: 600; }
+    .sidebar-link i { font-size: 1.15rem; margin-right: 0.75rem; width: 22px; text-align: center; }
+    .pulse-dot { width: 8px; height: 8px; background-color: #198754; border-radius: 50%; display: inline-block; animation: pulse-ring 1.8s infinite; }
+    @keyframes pulse-ring { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); } }
+    .ss-card { background: #ffffff; border: 1px solid var(--ss-card-border); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .badge-status { font-weight: 500; font-size: 0.75rem; padding: 0.35em 0.8em; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .badge-in-stock { background-color: #d1e7dd; color: #0f5132; }
+    .badge-low-stock { background-color: #fee2e2; color: #991b1b; }
+    .badge-out-of-stock { background-color: #f1f5f9; color: #475569; }
+    @media (max-width: 991.98px) {
+      .app-sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .app-sidebar.show { transform: translateX(0); }
+      .app-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <%- include('partials/sidebar', { activePage: 'products' }) %>
+
+    <div class="app-main">
+      <%- include('partials/navbar') %>
+
+      <main class="app-content">
+        <!-- Breadcrumb & Header -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+          <div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none text-muted">StockSense</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Products</li>
+              </ol>
+            </nav>
+            <h1 class="h3 fw-bold text-dark mb-0">Product Catalog</h1>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary bg-white d-flex align-items-center gap-1" style="border-radius: 8px;">
+              <i class="bi bi-file-earmark-arrow-up"></i> Import
+            </button>
+            <button class="btn btn-sm btn-outline-secondary bg-white d-flex align-items-center gap-1" style="border-radius: 8px;">
+              <i class="bi bi-download"></i> Export
+            </button>
+            <button class="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#addProductModal" style="border-radius: 8px;">
+              <i class="bi bi-plus-lg"></i> Add Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Ribbon -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-success">
+              <div class="text-muted small fw-medium">Total Products</div>
+              <div class="h4 fw-bold mb-0 text-dark">1,420 <span class="fs-6 fw-normal text-muted">SKUs</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-primary">
+              <div class="text-muted small fw-medium">Healthy Stock</div>
+              <div class="h4 fw-bold mb-0 text-dark">1,310 <span class="badge bg-success-subtle text-success small fs-7">92.2%</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-danger">
+              <div class="text-muted small fw-medium">Low Stock Alerts</div>
+              <div class="h4 fw-bold mb-0 text-danger">86 <span class="fs-7 fw-normal text-muted">Requires PO</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-secondary">
+              <div class="text-muted small fw-medium">Out of Stock</div>
+              <div class="h4 fw-bold mb-0 text-secondary">24 <span class="fs-7 fw-normal text-muted">0 Units</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters & Search Bar -->
+        <div class="ss-card p-3 mb-4">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 bg-light" id="productSearchInput" placeholder="Filter by product name, SKU, or barcode...">
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <select class="form-select form-select-sm" id="categoryFilter">
+                <option value="">All Categories</option>
+                <option value="Raw Materials">Raw Materials</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Packaging">Packaging</option>
+                <option value="Finished Goods">Finished Goods</option>
+                <option value="Hardware">Hardware</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <select class="form-select form-select-sm" id="stockFilter">
+                <option value="">All Stock Levels</option>
+                <option value="in_stock">In Stock (> Safety Level)</option>
+                <option value="low_stock">Low Stock Alerts</option>
+                <option value="out_of_stock">Out of Stock</option>
+              </select>
+            </div>
+            <div class="col-md-2 text-md-end">
+              <button class="btn btn-sm btn-light border w-100" id="resetFiltersBtn">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="ss-card mb-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" class="form-check-input" id="selectAllProducts"></th>
+                  <th>Product Details</th>
+                  <th>SKU & Barcode</th>
+                  <th>Category</th>
+                  <th class="text-end">Cost</th>
+                  <th class="text-end">Sales Price</th>
+                  <th class="text-center">On Hand</th>
+                  <th class="text-center">Forecasted</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <% 
+                  const defaultProducts = [
+                    { id: 1, name: 'Stainless Steel Hex Bolt M8', sku: 'BOLT-SS-08', barcode: '78912345001', category: 'Hardware', cost: 0.45, price: 1.20, onHand: 14, uom: 'pcs', forecasted: 264, status: 'low_stock', minAlert: 50, location: 'WH-01 / Zone A' },
+                    { id: 2, name: 'Lithium Iron Battery 48V 100Ah', sku: 'BAT-LFP-48100', barcode: '78912345002', category: 'Electronics', cost: 420.00, price: 680.00, onHand: 42, uom: 'units', forecasted: 28, status: 'in_stock', minAlert: 15, location: 'WH-01 / Zone C' },
+                    { id: 3, name: 'Thermal Silicone Paste 50g', sku: 'THM-SIL-50', barcode: '78912345003', category: 'Chemical', cost: 4.80, price: 9.50, onHand: 6, uom: 'tubes', forecasted: 56, status: 'low_stock', minAlert: 25, location: 'WH-01 / Zone B' },
+                    { id: 4, name: 'Aluminum Heatsink 120mm', sku: 'HSK-ALU-120', barcode: '78912345004', category: 'Finished Goods', cost: 12.50, price: 24.00, onHand: 180, uom: 'units', forecasted: 155, status: 'in_stock', minAlert: 30, location: 'WH-01 / Zone B' },
+                    { id: 5, name: 'Corrugated Shipping Box XL', sku: 'BOX-CRD-12', barcode: '78912345005', category: 'Packaging', cost: 1.15, price: 2.50, onHand: 0, uom: 'units', forecasted: 500, status: 'out_of_stock', minAlert: 100, location: 'WH-03 / Packaging' },
+                    { id: 6, name: 'Microcontroller ATmega328P', sku: 'MCU-ATM-328', barcode: '78912345006', category: 'Electronics', cost: 2.10, price: 4.50, onHand: 28, uom: 'units', forecasted: 28, status: 'low_stock', minAlert: 100, location: 'WH-01 / Rack 04' },
+                    { id: 7, name: 'Copper Wiring Reel 100m', sku: 'WIR-CPR-100', barcode: '78912345007', category: 'Raw Materials', cost: 35.00, price: 62.00, onHand: 65, uom: 'reels', forecasted: 65, status: 'in_stock', minAlert: 20, location: 'WH-02 / Wire-Bay' },
+                    { id: 8, name: 'Industrial Safety Goggles', sku: 'PPE-GGL-01', barcode: '78912345008', category: 'Hardware', cost: 5.20, price: 11.00, onHand: 112, uom: 'pairs', forecasted: 112, status: 'in_stock', minAlert: 30, location: 'WH-01 / Safety' }
+                  ];
+                  const productList = (typeof products !== 'undefined' && products && products.length) ? products : defaultProducts;
+                %>
+                <% productList.forEach(item => { %>
+                  <tr>
+                    <td><input type="checkbox" class="form-check-input product-checkbox"></td>
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded bg-light border text-success">
+                          <i class="bi bi-box-seam fs-6"></i>
+                        </div>
+                        <div>
+                          <div class="fw-semibold text-dark"><%= item.name %></div>
+                          <small class="text-muted"><i class="bi bi-geo-alt me-1"></i><%= item.location || 'Central WH' %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="font-monospace text-dark fw-medium small"><%= item.sku %></div>
+                      <small class="text-muted font-monospace"><%= item.barcode %></small>
+                    </td>
+                    <td><span class="badge bg-light text-secondary border"><%= item.category %></span></td>
+                    <td class="text-end fw-medium">$<%= Number(item.cost).toFixed(2) %></td>
+                    <td class="text-end fw-semibold text-dark">$<%= Number(item.price).toFixed(2) %></td>
+                    <td class="text-center">
+                      <span class="fw-bold <%= item.onHand <= (item.minAlert || 10) ? 'text-danger' : 'text-dark' %>">
+                        <%= item.onHand %>
+                      </span>
+                      <small class="text-muted d-block" style="font-size: 0.72rem;"><%= item.uom %></small>
+                    </td>
+                    <td class="text-center">
+                      <span class="text-muted"><%= item.forecasted %></span>
+                      <small class="text-muted d-block" style="font-size: 0.72rem;"><%= item.uom %></small>
+                    </td>
+                    <td>
+                      <% if (item.status === 'in_stock' || item.onHand > (item.minAlert || 10)) { %>
+                        <span class="badge-status badge-in-stock"><i class="bi bi-check-circle-fill"></i> In Stock</span>
+                      <% } else if (item.status === 'low_stock' || (item.onHand > 0 && item.onHand <= (item.minAlert || 10))) { %>
+                        <span class="badge-status badge-low-stock"><i class="bi bi-exclamation-triangle-fill"></i> Low Stock</span>
+                      <% } else { %>
+                        <span class="badge-status badge-out-of-stock"><i class="bi bi-x-circle-fill"></i> Out of Stock</span>
+                      <% } %>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-light border py-1 px-2" title="Adjust Stock" data-bs-toggle="modal" data-bs-target="#adjustStockModal">
+                          <i class="bi bi-sliders text-secondary"></i>
+                        </button>
+                        <button class="btn btn-light border py-1 px-2" title="Edit Product">
+                          <i class="bi bi-pencil text-secondary"></i>
+                        </button>
+                        <a href="/ledger" class="btn btn-light border py-1 px-2" title="Stock Moves">
+                          <i class="bi bi-clock-history text-secondary"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between p-3 border-top gap-2">
+            <span class="text-muted small">Showing 1 to 8 of 1,420 entries</span>
+            <nav aria-label="Page navigation">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                <li class="page-item active"><a class="page-link bg-success border-success" href="#">1</a></li>
+                <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+                <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+                <li class="page-item"><a class="page-link text-dark" href="#">Next</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </main>
+
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+
+  <!-- Add Product Modal -->
+  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="addProductModalLabel">
+            <i class="bi bi-box-seam me-2 text-success"></i> Add New Product
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/products" method="POST">
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label for="productName" class="form-label small fw-semibold">Product Name *</label>
+                <input type="text" class="form-control" id="productName" name="name" placeholder="e.g. Precision CNC Aluminum Mount" required>
+              </div>
+              <div class="col-md-4">
+                <label for="productCategory" class="form-label small fw-semibold">Category *</label>
+                <select class="form-select" id="productCategory" name="category" required>
+                  <option value="" disabled selected>Select Category</option>
+                  <option value="Raw Materials">Raw Materials</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Packaging">Packaging</option>
+                  <option value="Finished Goods">Finished Goods</option>
+                  <option value="Hardware">Hardware</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="productSKU" class="form-label small fw-semibold">SKU / Internal Code *</label>
+                <input type="text" class="form-control font-monospace" id="productSKU" name="sku" placeholder="MNT-ALU-01" required>
+              </div>
+              <div class="col-md-4">
+                <label for="productBarcode" class="form-label small fw-semibold">Barcode (EAN/UPC)</label>
+                <input type="text" class="form-control font-monospace" id="productBarcode" name="barcode" placeholder="789012345678">
+              </div>
+              <div class="col-md-4">
+                <label for="productUOM" class="form-label small fw-semibold">Unit of Measure</label>
+                <select class="form-select" id="productUOM" name="uom">
+                  <option value="pcs" selected>Pieces (pcs)</option>
+                  <option value="units">Units</option>
+                  <option value="kg">Kilograms (kg)</option>
+                  <option value="box">Boxes</option>
+                  <option value="m">Meters (m)</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="productCost" class="form-label small fw-semibold">Cost Price ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" step="0.01" class="form-control" id="productCost" name="cost" placeholder="0.00" required>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label for="productPrice" class="form-label small fw-semibold">Sale Price ($)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" step="0.01" class="form-control" id="productPrice" name="price" placeholder="0.00" required>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label for="initialStock" class="form-label small fw-semibold">Initial Stock Qty</label>
+                <input type="number" class="form-control" id="initialStock" name="initialStock" value="0" min="0">
+              </div>
+              <div class="col-md-3">
+                <label for="minAlert" class="form-label small fw-semibold">Min Stock Alert</label>
+                <input type="number" class="form-control" id="minAlert" name="minAlert" value="20" min="0">
+              </div>
+              <div class="col-md-12">
+                <label for="productLocation" class="form-label small fw-semibold">Default Warehouse & Bin Location</label>
+                <input type="text" class="form-control" id="productLocation" name="location" placeholder="e.g. WH-01 / Zone A / Rack-03">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top bg-light-subtle">
+            <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-success px-3">Save Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stock Adjust Modal -->
+  <div class="modal fade" id="adjustStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold"><i class="bi bi-sliders me-2 text-success"></i>Quick Stock Adjustment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/adjustments" method="POST">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Selected Product</label>
+              <input type="text" class="form-control bg-light" value="Stainless Steel Hex Bolt M8 (BOLT-SS-08)" readonly>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small fw-semibold">Current System Stock</label>
+                <input type="number" class="form-control bg-light" value="14" readonly>
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold">Physical Count</label>
+                <input type="number" class="form-control" name="countedQty" value="14" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Reason for Adjustment</label>
+              <select class="form-select" name="reason">
+                <option value="cycle_count">Regular Cycle Count</option>
+                <option value="damaged">Damaged Goods Discarded</option>
+                <option value="loss">Inventory Discrepancy / Shrinkage</option>
+                <option value="sample">Internal Quality Sample</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer border-top bg-light-subtle">
+            <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-success">Confirm Adjustment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

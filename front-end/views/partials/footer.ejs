@@ -1,0 +1,108 @@
+<!-- Footer -->
+<footer class="app-footer bg-white border-top py-3 px-4 mt-auto">
+  <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 small text-muted">
+    <div>
+      <span class="fw-semibold text-dark">StockSense</span> IMS &copy; 2026. All rights reserved.
+      <span class="mx-2 text-black-50">&bull;</span>
+      <span class="badge bg-light text-secondary border">v1.2 Enterprise</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span class="d-flex align-items-center gap-1">
+        <i class="bi bi-shield-check text-success"></i> All Systems Operational
+      </span>
+      <span class="text-black-50">&bull;</span>
+      <a href="#" class="text-decoration-none text-muted hover-underline" data-bs-toggle="modal" data-bs-target="#shortcutsModal">
+        <i class="bi bi-keyboard me-1"></i> Shortcuts
+      </a>
+      <span class="text-black-50">&bull;</span>
+      <a href="#" class="text-decoration-none text-muted hover-underline">Help & Docs</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold" id="shortcutsModalLabel"><i class="bi bi-keyboard me-2 text-success"></i>Keyboard Shortcuts</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="text-secondary">Focus Global Search</span>
+          <span class="badge bg-light border text-dark font-monospace">Ctrl + K</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="text-secondary">Toggle Sidebar</span>
+          <span class="badge bg-light border text-dark font-monospace">Ctrl + B</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="text-secondary">New Product Modal</span>
+          <span class="badge bg-light border text-dark font-monospace">Alt + P</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="text-secondary">New Receipt Modal</span>
+          <span class="badge bg-light border text-dark font-monospace">Alt + R</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center py-2">
+          <span class="text-secondary">New Delivery Modal</span>
+          <span class="badge bg-light border text-dark font-monospace">Alt + D</span>
+        </div>
+      </div>
+      <div class="modal-footer border-top bg-light-subtle py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5.3.3 JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js for data visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Global Application Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Mobile Sidebar toggle
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const closeBtn = document.getElementById('sidebarCloseBtn');
+    const sidebar = document.getElementById('sidebarNav');
+
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    if (closeBtn && sidebar) {
+      closeBtn.addEventListener('click', function () {
+        sidebar.classList.remove('show');
+      });
+    }
+
+    // Keyboard shortcuts (Ctrl+K for search)
+    const searchInput = document.getElementById('globalSearchInput');
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        if (sidebar) {
+          sidebar.classList.toggle('show');
+        }
+      }
+    });
+
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>

@@ -1,0 +1,139 @@
+<!-- Top Navigation Bar -->
+<header class="app-navbar d-flex align-items-center justify-content-between px-3 px-lg-4 py-2 border-bottom bg-white sticky-top">
+  <!-- Left: Sidebar Toggle & Page Title / Breadcrumbs -->
+  <div class="d-flex align-items-center gap-3">
+    <button class="btn btn-light btn-sm d-lg-none p-1 px-2 border" id="sidebarToggleBtn" type="button" aria-label="Toggle navigation">
+      <i class="bi bi-list fs-5"></i>
+    </button>
+
+    <!-- Global Search Bar -->
+    <div class="position-relative d-none d-md-block" style="min-width: 280px; max-width: 440px;">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size: 0.85rem;"></i>
+      <input type="text" class="form-control form-control-sm ps-5 pe-5 py-2 bg-light border-0" id="globalSearchInput" placeholder="Search products, SKUs, orders, lots..." style="border-radius: 8px; font-size: 0.85rem;">
+      <span class="position-absolute top-50 end-0 translate-middle-y me-2 badge bg-white border text-secondary fw-normal font-monospace" style="font-size: 0.68rem;">Ctrl K</span>
+    </div>
+  </div>
+
+  <!-- Right: Quick Actions, Status, Notifications & Profile -->
+  <div class="d-flex align-items-center gap-2 gap-sm-3">
+    <!-- Live Status Pill -->
+    <div class="d-none d-sm-flex align-items-center gap-1 py-1 px-2 rounded-pill bg-success-subtle text-success border border-success-subtle" style="font-size: 0.72rem; font-weight: 600;">
+      <span class="pulse-dot"></span>
+      <span>Live Sync</span>
+    </div>
+
+    <!-- Quick Action Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-success btn-sm dropdown-toggle fw-medium px-3 d-flex align-items-center gap-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
+        <i class="bi bi-plus-lg"></i>
+        <span class="d-none d-sm-inline">Create</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="font-size: 0.85rem; min-width: 200px;">
+        <li><h6 class="dropdown-header text-uppercase small text-muted">Quick Operations</h6></li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/receipts" data-bs-toggle="modal" data-bs-target="#newReceiptModal">
+            <i class="bi bi-arrow-down-left-square text-primary"></i> New Receipt
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/deliveries" data-bs-toggle="modal" data-bs-target="#newDeliveryModal">
+            <i class="bi bi-arrow-up-right-square text-warning-emphasis"></i> New Delivery Order
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/transfers" data-bs-toggle="modal" data-bs-target="#newTransferModal">
+            <i class="bi bi-arrow-left-right text-info"></i> Internal Transfer
+          </a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/products" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="bi bi-box-seam text-success"></i> Add New Product
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/adjustments" data-bs-toggle="modal" data-bs-target="#newAdjustmentModal">
+            <i class="bi bi-sliders text-secondary"></i> Stock Count / Adjustment
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Notifications Bell Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-light btn-sm position-relative p-2 border" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;" aria-label="Notifications">
+        <i class="bi bi-bell text-secondary fs-6"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.65rem;">
+          3
+        </span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" style="width: 320px; font-size: 0.85rem;">
+        <div class="d-flex align-items-center justify-content-between p-3 border-bottom bg-light-subtle">
+          <h6 class="mb-0 fw-bold">Stock Alerts</h6>
+          <span class="badge bg-danger-subtle text-danger">3 Critical</span>
+        </div>
+        <div class="list-group list-group-flush" style="max-height: 280px; overflow-y: auto;">
+          <a href="/products" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex gap-2">
+              <i class="bi bi-exclamation-triangle-fill text-danger fs-5 mt-1"></i>
+              <div>
+                <p class="mb-1 fw-semibold text-dark small">Low Stock: M8 Industrial Bolts</p>
+                <p class="mb-0 text-muted small">Current: 14 units (Min threshold: 50)</p>
+                <small class="text-secondary opacity-75">10m ago • Central WH</small>
+              </div>
+            </div>
+          </a>
+          <a href="/receipts" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex gap-2">
+              <i class="bi bi-truck text-primary fs-5 mt-1"></i>
+              <div>
+                <p class="mb-1 fw-semibold text-dark small">Inbound Shipment Arrived</p>
+                <p class="mb-0 text-muted small">PO-2026-891 from Acme Corp at Bay 2</p>
+                <small class="text-secondary opacity-75">35m ago • Receiving</small>
+              </div>
+            </div>
+          </a>
+          <a href="/adjustments" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex gap-2">
+              <i class="bi bi-check-circle-fill text-success fs-5 mt-1"></i>
+              <div>
+                <p class="mb-1 fw-semibold text-dark small">Adjustment Approved</p>
+                <p class="mb-0 text-muted small">INV/ADJ/0031 reconciled (+4 units)</p>
+                <small class="text-secondary opacity-75">2h ago • Zone A</small>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="p-2 border-top text-center">
+          <a href="/ledger" class="text-success text-decoration-none small fw-semibold">View All Activity & Audit</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-light btn-sm d-flex align-items-center gap-2 p-1 pe-2 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar-circle bg-success text-white fw-bold" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content-center; font-size: 0.8rem;">
+          AS
+        </div>
+        <div class="text-start d-none d-xl-block">
+          <div class="fw-semibold text-dark lh-1" style="font-size: 0.82rem;">Alex Smith</div>
+          <small class="text-muted" style="font-size: 0.7rem;">Warehouse Admin</small>
+        </div>
+        <i class="bi bi-chevron-down text-muted small ms-1"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="font-size: 0.85rem; min-width: 180px;">
+        <li class="px-3 py-1">
+          <div class="fw-semibold text-dark">Alex Smith</div>
+          <div class="text-muted small">alex.smith@stocksense.io</div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"><i class="bi bi-person text-secondary"></i> My Profile</a></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"><i class="bi bi-gear text-secondary"></i> System Settings</a></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#"><i class="bi bi-question-circle text-secondary"></i> Help & Guides</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="/login"><i class="bi bi-box-arrow-right"></i> Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>

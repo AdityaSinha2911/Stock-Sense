@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Ledger | StockSense IMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --ss-primary: #157347;
+      --ss-primary-hover: #115c38;
+      --ss-primary-light: #e8f5e9;
+      --ss-card-border: #e1e8e5;
+      --ss-bg: #f4f7f6;
+      --ss-text-main: #1e293b;
+      --ss-text-muted: #64748b;
+      --ss-sidebar-width: 260px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--ss-bg); color: var(--ss-text-main); }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .app-sidebar { width: var(--ss-sidebar-width); flex-shrink: 0; background: #ffffff; border-right: 1px solid var(--ss-card-border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 1030; transition: transform 0.25s ease-in-out; }
+    .app-main { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; background-color: var(--ss-bg); }
+    .app-content { flex-grow: 1; padding: 1.75rem; }
+    .sidebar-link { display: flex; align-items: center; padding: 0.65rem 0.95rem; color: #475569; text-decoration: none; font-weight: 500; font-size: 0.88rem; border-radius: 8px; margin-bottom: 0.2rem; transition: all 0.15s ease; }
+    .sidebar-link:hover { background-color: #f1f5f9; color: var(--ss-primary); }
+    .sidebar-link.active { background-color: var(--ss-primary-light); color: var(--ss-primary); font-weight: 600; }
+    .sidebar-link i { font-size: 1.15rem; margin-right: 0.75rem; width: 22px; text-align: center; }
+    .ss-card { background: #ffffff; border: 1px solid var(--ss-card-border); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .badge-status { font-weight: 500; font-size: 0.75rem; padding: 0.35em 0.8em; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
+    @media (max-width: 991.98px) {
+      .app-sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .app-sidebar.show { transform: translateX(0); }
+      .app-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <%- include('partials/sidebar', { activePage: 'ledger' }) %>
+
+    <div class="app-main">
+      <%- include('partials/navbar') %>
+
+      <main class="app-content">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+          <div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none text-muted">StockSense</a></li>
+                <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Auditing & Reporting</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Stock Ledger</li>
+              </ol>
+            </nav>
+            <h1 class="h3 fw-bold text-dark mb-0">Stock Ledger & Audit Trail</h1>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary bg-white d-flex align-items-center gap-1" style="border-radius: 8px;">
+              <i class="bi bi-printer"></i> Print Statement
+            </button>
+            <button class="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm" style="border-radius: 8px;">
+              <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Ribbon -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-primary">
+              <div class="text-muted small fw-medium">Total Recorded Moves</div>
+              <div class="h4 fw-bold mb-0 text-dark">2,845 <span class="fs-6 fw-normal text-muted">Entries</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-success">
+              <div class="text-muted small fw-medium">Total Inbound Flow</div>
+              <div class="h4 fw-bold mb-0 text-success">+14,200 <span class="fs-6 fw-normal text-muted">Units</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-warning">
+              <div class="text-muted small fw-medium">Total Outbound Flow</div>
+              <div class="h4 fw-bold mb-0 text-warning-emphasis">-11,840 <span class="fs-6 fw-normal text-muted">Units</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-secondary">
+              <div class="text-muted small fw-medium">Current Book Valuation</div>
+              <div class="h4 fw-bold mb-0 text-dark">$284,520 <span class="fs-7 fw-normal text-muted">USD</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="ss-card p-3 mb-4">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 bg-light" placeholder="Search reference, SKU, or product...">
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <select class="form-select form-select-sm">
+                <option value="">All Movement Types</option>
+                <option value="inbound">Receipts (Inbound)</option>
+                <option value="outbound">Deliveries (Outbound)</option>
+                <option value="transfer">Internal Transfers</option>
+                <option value="adjustment">Stock Adjustments</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <select class="form-select form-select-sm">
+                <option value="">All Warehouses</option>
+                <option>Central WH (WH-01)</option>
+                <option>East Coast Hub (WH-02)</option>
+                <option>Packaging Plant (WH-03)</option>
+              </select>
+            </div>
+            <div class="col-md-2 text-md-end">
+              <select class="form-select form-select-sm">
+                <option selected>Last 30 Days</option>
+                <option>This Quarter</option>
+                <option>Last 12 Months</option>
+                <option>All Time</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="ss-card mb-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Type</th>
+                  <th>Reference</th>
+                  <th>Product & SKU</th>
+                  <th>Source &rarr; Destination</th>
+                  <th class="text-center">Qty Change</th>
+                  <th class="text-end">Unit Cost</th>
+                  <th class="text-end">Value Impact</th>
+                  <th class="text-center">Running Stock</th>
+                  <th>Operator</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% 
+                  const defaultLedger = [
+                    { time: '2026-10-14 11:30', type: 'transfer', ref: 'WH/INT/00085', product: 'Aluminum Heatsink 120mm', sku: 'HSK-ALU-120', from: 'Zone A', to: 'Zone C', qtyChange: '50', unitCost: 12.50, valImpact: '$0.00', balance: 180, user: 'Marcus Vance' },
+                    { time: '2026-10-14 09:30', type: 'receipt', ref: 'WH/IN/00104', product: 'Stainless Steel Hex Bolt M8', sku: 'BOLT-SS-08', from: 'Acme Corp', to: 'Receiving Bay 2', qtyChange: '+250', unitCost: 0.45, valImpact: '+$112.50', balance: 264, user: 'Alex Smith' },
+                    { time: '2026-10-14 08:15', type: 'adjustment', ref: 'INV/ADJ/00031', product: 'Stainless Steel Hex Bolt M8', sku: 'BOLT-SS-08', from: 'Physical Count', to: 'Zone A', qtyChange: '+4', unitCost: 0.45, valImpact: '+$1.80', balance: 14, user: 'Dave Chen' },
+                    { time: '2026-10-13 16:45', type: 'delivery', ref: 'WH/OUT/00248', product: 'Lithium Iron Battery 48V', sku: 'BAT-LFP-48100', from: 'Zone C', to: 'Quantum Dynamics', qtyChange: '-12', unitCost: 420.00, valImpact: '-$5,040.00', balance: 42, user: 'Sarah Jenkins' },
+                    { time: '2026-10-13 14:00', type: 'receipt', ref: 'WH/IN/00100', product: 'Thermal Silicone Paste 50g', sku: 'THM-SIL-50', from: 'ChemTech', to: 'Hazmat Bay', qtyChange: '+50', unitCost: 4.80, valImpact: '+$240.00', balance: 56, user: 'Elena Rostova' },
+                    { time: '2026-10-12 11:20', type: 'delivery', ref: 'WH/OUT/00243', product: 'Copper Wiring Reel 100m', sku: 'WIR-CPR-100', from: 'Wire-Bay', to: 'Omni Retailers', qtyChange: '-5', unitCost: 35.00, valImpact: '-$175.00', balance: 65, user: 'Marcus Vance' },
+                    { time: '2026-10-11 15:30', type: 'adjustment', ref: 'INV/ADJ/00027', product: 'Corrugated Shipping Box XL', sku: 'BOX-CRD-12', from: 'Packaging', to: 'Scrap / Damaged', qtyChange: '-15', unitCost: 1.15, valImpact: '-$17.25', balance: 0, user: 'Alex Smith' }
+                  ];
+                  const ledgerList = (typeof ledger !== 'undefined' && ledger && ledger.length) ? ledger : defaultLedger;
+                %>
+                <% ledgerList.forEach(item => { %>
+                  <tr>
+                    <td><span class="text-muted font-monospace"><%= item.time %></span></td>
+                    <td>
+                      <% if (item.type === 'receipt') { %>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-box-arrow-in-down me-1"></i> Receipt</span>
+                      <% } else if (item.type === 'delivery') { %>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-box-arrow-up-right me-1"></i> Delivery</span>
+                      <% } else if (item.type === 'transfer') { %>
+                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle"><i class="bi bi-arrow-left-right me-1"></i> Transfer</span>
+                      <% } else { %>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border"><i class="bi bi-sliders me-1"></i> Adjustment</span>
+                      <% } %>
+                    </td>
+                    <td><a href="#" class="font-monospace fw-semibold text-dark text-decoration-none"><%= item.ref %></a></td>
+                    <td>
+                      <div class="fw-semibold text-dark"><%= item.product %></div>
+                      <small class="text-muted font-monospace"><%= item.sku %></small>
+                    </td>
+                    <td>
+                      <span class="text-secondary small font-monospace"><%= item.from %> &rarr; <%= item.to %></span>
+                    </td>
+                    <td class="text-center font-monospace fw-bold <%= item.qtyChange.startsWith('+') ? 'text-success' : (item.qtyChange.startsWith('-') ? 'text-danger' : 'text-primary') %>">
+                      <%= item.qtyChange %>
+                    </td>
+                    <td class="text-end font-monospace text-muted">$<%= Number(item.unitCost).toFixed(2) %></td>
+                    <td class="text-end font-monospace fw-semibold <%= item.valImpact.startsWith('+') ? 'text-success' : (item.valImpact.startsWith('-') ? 'text-danger' : 'text-secondary') %>">
+                      <%= item.valImpact %>
+                    </td>
+                    <td class="text-center font-monospace fw-bold text-dark bg-light-subtle">
+                      <%= item.balance %>
+                    </td>
+                    <td><span class="small text-muted"><%= item.user %></span></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between p-3 border-top gap-2">
+            <span class="text-muted small">Showing 1 to 7 of 2,845 recorded movements</span>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+              <li class="page-item active"><a class="page-link bg-success border-success" href="#">1</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">...</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">Next</a></li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+</body>
+</html>

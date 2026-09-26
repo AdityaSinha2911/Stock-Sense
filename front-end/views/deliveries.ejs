@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deliveries (Outbound) | StockSense IMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --ss-primary: #157347;
+      --ss-primary-hover: #115c38;
+      --ss-primary-light: #e8f5e9;
+      --ss-card-border: #e1e8e5;
+      --ss-bg: #f4f7f6;
+      --ss-text-main: #1e293b;
+      --ss-text-muted: #64748b;
+      --ss-sidebar-width: 260px;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--ss-bg); color: var(--ss-text-main); }
+    .app-wrapper { display: flex; min-height: 100vh; }
+    .app-sidebar { width: var(--ss-sidebar-width); flex-shrink: 0; background: #ffffff; border-right: 1px solid var(--ss-card-border); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; z-index: 1030; transition: transform 0.25s ease-in-out; }
+    .app-main { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; background-color: var(--ss-bg); }
+    .app-content { flex-grow: 1; padding: 1.75rem; }
+    .sidebar-link { display: flex; align-items: center; padding: 0.65rem 0.95rem; color: #475569; text-decoration: none; font-weight: 500; font-size: 0.88rem; border-radius: 8px; margin-bottom: 0.2rem; transition: all 0.15s ease; }
+    .sidebar-link:hover { background-color: #f1f5f9; color: var(--ss-primary); }
+    .sidebar-link.active { background-color: var(--ss-primary-light); color: var(--ss-primary); font-weight: 600; }
+    .sidebar-link i { font-size: 1.15rem; margin-right: 0.75rem; width: 22px; text-align: center; }
+    .ss-card { background: #ffffff; border: 1px solid var(--ss-card-border); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .badge-status { font-weight: 500; font-size: 0.75rem; padding: 0.35em 0.8em; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .badge-done { background-color: #d1e7dd; color: #0f5132; }
+    .badge-ready { background-color: #cff4fc; color: #055160; }
+    .badge-waiting { background-color: #fff3cd; color: #664d03; }
+    .badge-draft { background-color: #e2e3e5; color: #41464b; }
+    .badge-in-transit { background-color: #e0e7ff; color: #3730a3; }
+    @media (max-width: 991.98px) {
+      .app-sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .app-sidebar.show { transform: translateX(0); }
+      .app-content { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <%- include('partials/sidebar', { activePage: 'deliveries' }) %>
+
+    <div class="app-main">
+      <%- include('partials/navbar') %>
+
+      <main class="app-content">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+          <div>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none text-muted">StockSense</a></li>
+                <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Operations</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Deliveries</li>
+              </ol>
+            </nav>
+            <h1 class="h3 fw-bold text-dark mb-0">Delivery Orders (WH/OUT)</h1>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary bg-white d-flex align-items-center gap-1" style="border-radius: 8px;">
+              <i class="bi bi-box-seam"></i> Batch Dispatch
+            </button>
+            <button class="btn btn-sm btn-success d-flex align-items-center gap-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#newDeliveryModal" style="border-radius: 8px;">
+              <i class="bi bi-plus-lg"></i> Create Delivery Order
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Ribbon -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-success">
+              <div class="text-muted small fw-medium">Ready to Dispatch</div>
+              <div class="h4 fw-bold mb-0 text-dark">9 <span class="fs-6 fw-normal text-muted">Orders</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-warning">
+              <div class="text-muted small fw-medium">Waiting Availability</div>
+              <div class="h4 fw-bold mb-0 text-warning-emphasis">7 <span class="fs-6 fw-normal text-muted">Backordered</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-primary">
+              <div class="text-muted small fw-medium">In Transit</div>
+              <div class="h4 fw-bold mb-0 text-primary">6 <span class="fs-7 fw-normal text-muted">With Carrier</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="ss-card p-3 border-start border-4 border-secondary">
+              <div class="text-muted small fw-medium">Dispatched This Month</div>
+              <div class="h4 fw-bold mb-0 text-dark">142 <span class="fs-6 fw-normal text-muted">Shipped</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="ss-card p-3 mb-4">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 bg-light" placeholder="Search delivery reference (WH/OUT/...), customer, or SO#...">
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <select class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="ready">Ready to Dispatch</option>
+                <option value="waiting">Waiting Availability</option>
+                <option value="in_transit">In Transit</option>
+                <option value="done">Delivered / Done</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-4 text-md-end">
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active">All</button>
+                <button type="button" class="btn btn-outline-secondary">Today</button>
+                <button type="button" class="btn btn-outline-secondary">This Week</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliveries Table -->
+        <div class="ss-card mb-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" class="form-check-input"></th>
+                  <th>Delivery Ref</th>
+                  <th>Customer / Recipient</th>
+                  <th>Source Order</th>
+                  <th>Carrier & Tracking</th>
+                  <th>Scheduled Date</th>
+                  <th>Items / Qty</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% 
+                  const defaultDeliveries = [
+                    { ref: 'WH/OUT/00248', customer: 'Quantum Dynamics Corp', so: 'SO-2026-442', carrier: 'FedEx Express (TRK-9812)', date: '2026-10-14 14:00', items: '120 units', status: 'ready' },
+                    { ref: 'WH/OUT/00247', customer: 'Tesla Energy Hub', so: 'SO-2026-440', carrier: 'Freight Direct (TRK-5521)', date: '2026-10-14 16:30', items: '14 units (Heavy)', status: 'ready' },
+                    { ref: 'WH/OUT/00246', customer: 'Nexus Electronics', so: 'SO-2026-438', carrier: 'UPS Ground (TRK-7714)', date: '2026-10-15 10:00', items: '450 pcs', status: 'waiting' },
+                    { ref: 'WH/OUT/00245', customer: 'BlueRiver Manufacturing', so: 'SO-2026-435', carrier: 'DHL Express (TRK-1002)', date: '2026-10-15 11:30', items: '80 units', status: 'waiting' },
+                    { ref: 'WH/OUT/00244', customer: 'Vortex Aerospace', so: 'SO-2026-429', carrier: 'FedEx Priority (TRK-8819)', date: '2026-10-13 17:00', items: '24 units', status: 'in_transit' },
+                    { ref: 'WH/OUT/00243', customer: 'Omni Retailers Group', so: 'SO-2026-418', carrier: 'Local Courier Fleet', date: '2026-10-12 13:00', items: '600 pcs', status: 'done' },
+                    { ref: 'WH/OUT/00242', customer: 'Summit Industrial Works', so: 'SO-2026-410', carrier: 'UPS Ground (TRK-3341)', date: '2026-10-11 09:45', items: '32 units', status: 'done' }
+                  ];
+                  const deliveryList = (typeof deliveries !== 'undefined' && deliveries && deliveries.length) ? deliveries : defaultDeliveries;
+                %>
+                <% deliveryList.forEach(d => { %>
+                  <tr>
+                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td>
+                      <a href="#" class="fw-bold text-success text-decoration-none font-monospace"><%= d.ref %></a>
+                    </td>
+                    <td>
+                      <div class="fw-semibold text-dark"><%= d.customer %></div>
+                      <small class="text-muted"><i class="bi bi-person me-1"></i>Verified Client</small>
+                    </td>
+                    <td><span class="badge bg-light text-dark border font-monospace"><%= d.so %></span></td>
+                    <td>
+                      <div class="small fw-medium text-dark"><%= d.carrier %></div>
+                      <small class="text-muted"><i class="bi bi-truck me-1"></i>Standard Dispatch</small>
+                    </td>
+                    <td><span class="small text-muted"><%= d.date %></span></td>
+                    <td><span class="badge bg-light text-secondary border"><%= d.items %></span></td>
+                    <td>
+                      <% if (d.status === 'ready') { %>
+                        <span class="badge-status badge-ready"><i class="bi bi-box-seam"></i> Ready</span>
+                      <% } else if (d.status === 'done') { %>
+                        <span class="badge-status badge-done"><i class="bi bi-check-circle-fill"></i> Delivered</span>
+                      <% } else if (d.status === 'in_transit') { %>
+                        <span class="badge-status badge-in-transit"><i class="bi bi-truck"></i> In Transit</span>
+                      <% } else { %>
+                        <span class="badge-status badge-waiting"><i class="bi bi-hourglass-split"></i> Waiting</span>
+                      <% } %>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <% if (d.status === 'ready') { %>
+                          <button class="btn btn-sm btn-success px-2 py-1" title="Validate and Dispatch">
+                            <i class="bi bi-send-check me-1"></i> Ship
+                          </button>
+                        <% } %>
+                        <button class="btn btn-light border py-1 px-2" title="Print Packing Slip">
+                          <i class="bi bi-printer text-secondary"></i>
+                        </button>
+                        <button class="btn btn-light border py-1 px-2" title="View Details">
+                          <i class="bi bi-eye text-secondary"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination -->
+          <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between p-3 border-top gap-2">
+            <span class="text-muted small">Showing 1 to 7 of 22 deliveries</span>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+              <li class="page-item active"><a class="page-link bg-success border-success" href="#">1</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+              <li class="page-item"><a class="page-link text-dark" href="#">Next</a></li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      <%- include('partials/footer') %>
+    </div>
+  </div>
+
+  <!-- Create Delivery Order Modal -->
+  <div class="modal fade" id="newDeliveryModal" tabindex="-1" aria-labelledby="newDeliveryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="newDeliveryModalLabel">
+            <i class="bi bi-arrow-up-right-square text-warning-emphasis me-2"></i> Create Delivery Order
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/deliveries" method="POST">
+          <div class="modal-body p-4">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Customer / Destination *</label>
+                <input type="text" class="form-control" name="customer" placeholder="e.g. Quantum Dynamics Corp" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Sales Order Reference *</label>
+                <input type="text" class="form-control font-monospace" name="so" placeholder="SO-2026-450" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Shipping Carrier & Service *</label>
+                <select class="form-select" name="carrier" required>
+                  <option value="FedEx Express">FedEx Express Ground</option>
+                  <option value="UPS Freight">UPS Freight</option>
+                  <option value="DHL Express">DHL Express Worldwide</option>
+                  <option value="Internal Logistics">Company Fleet Truck</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Scheduled Dispatch Date *</label>
+                <input type="datetime-local" class="form-control" name="scheduledDate" required>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-2 small text-uppercase text-muted">Outbound Items & Reserved Stock</h6>
+            <div class="table-responsive border rounded mb-3">
+              <table class="table table-sm align-middle mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th>Product</th>
+                    <th width="140">Quantity to Pick</th>
+                    <th width="140">Available Stock</th>
+                    <th width="50"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <select class="form-select form-select-sm" name="product">
+                        <option>Lithium Iron Battery 48V (BAT-LFP-48100)</option>
+                        <option>Aluminum Heatsink 120mm (HSK-ALU-120)</option>
+                        <option>Stainless Steel Hex Bolt M8 (BOLT-SS-08)</option>
+                      </select>
+                    </td>
+                    <td><input type="number" class="form-control form-control-sm" placeholder="10" value="4"></td>
+                    <td><span class="badge bg-success-subtle text-success">42 Available</span></td>
+                    <td class="text-center"><button type="button" class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-trash"></i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-plus-lg me-1"></i> Add Item Line</button>
+
+            <div>
+              <label class="form-label small fw-semibold">Packaging & Shipping Instructions</label>
+              <textarea class="form-control" rows="2" placeholder="Fragile, handle with care, pack with foam cushion..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-top bg-light-subtle">
+            <button type="button" class="btn btn-sm btn-light border" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-success px-3">Confirm Delivery Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
