@@ -9,17 +9,27 @@
 		body {
 			min-height: 100vh;
 			background-color: #f4f7f6;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 		}
 
 		.login-card {
-			max-width: 420px;
+			max-width: 440px;
 			border: 1px solid #e1e8e5;
-			border-radius: 12px;
+			border-radius: 14px;
 		}
 
 		.brand-mark {
 			color: #157347;
 			letter-spacing: 0.02em;
+		}
+
+		.demo-badge {
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.demo-badge:hover {
+			background-color: #e9ecef;
 		}
 	</style>
 </head>
@@ -28,27 +38,39 @@
 		<section class="login-card bg-white shadow-sm mx-auto p-4 p-sm-5" aria-labelledby="login-title">
 			<div class="text-center mb-4">
 				<div class="brand-mark fw-bold fs-2">StockSense</div>
-				<h1 id="login-title" class="h4 mt-3 mb-2">Welcome back</h1>
-				<p class="text-secondary mb-0">Sign in to manage your inventory.</p>
+				<h1 id="login-title" class="h4 mt-2 mb-1">Welcome back</h1>
+				<p class="text-secondary small mb-0">Sign in to manage your inventory.</p>
 			</div>
 
-			<form action="#" method="post">
+			<div id="alertBox" class="alert d-none" role="alert"></div>
+
+			<form id="loginForm">
 				<div class="mb-3">
 					<label for="email" class="form-label">Email address</label>
-					<input type="email" class="form-control" id="email" name="email" autocomplete="email" required>
+					<input type="email" class="form-control" id="email" name="email" autocomplete="email" placeholder="name@company.com" required>
 				</div>
 
 				<div class="mb-2">
 					<label for="password" class="form-label">Password</label>
-					<input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+					<input type="password" class="form-control" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
 				</div>
 
 				<div class="text-end mb-4">
 					<a href="#" class="link-success small">Forgot Password?</a>
 				</div>
 
-				<button type="submit" class="btn btn-success w-100">Login</button>
+				<button type="submit" id="submitBtn" class="btn btn-success w-100 py-2">Login</button>
 			</form>
+
+			<!-- Quick Demo Fill -->
+			<div class="mt-4 pt-3 border-top text-center">
+				<p class="text-muted small mb-2">Testing database? Click below to autofill:</p>
+				<div class="d-flex justify-content-center gap-2">
+					<span class="badge bg-light text-dark border demo-badge p-2" onclick="fillCredentials('admin@stocksense.com', 'admin123')">
+						🔑 Admin: admin@stocksense.com
+					</span>
+				</div>
+			</div>
 
 			<p class="text-center text-secondary small mt-4 mb-0">
 				Don't have an account?
@@ -56,5 +78,59 @@
 			</p>
 		</section>
 	</main>
+
+	<script>
+		function fillCredentials(email, password) {
+			document.getElementById('email').value = email;
+			document.getElementById('password').value = password;
+		}
+
+		const loginForm = document.getElementById('loginForm');
+		const alertBox = document.getElementById('alertBox');
+		const submitBtn = document.getElementById('submitBtn');
+
+		function showAlert(message, type = 'danger') {
+			alertBox.className = `alert alert-${type}`;
+			alertBox.textContent = message;
+			alertBox.classList.remove('d-none');
+		}
+
+		loginForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			alertBox.classList.add('d-none');
+
+			const email = document.getElementById('email').value.trim();
+			const password = document.getElementById('password').value;
+
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Verifying...';
+
+			try {
+				const response = await fetch('/api/auth/login', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ email, password })
+				});
+
+				const data = await response.json();
+
+				if (response.ok && data.success) {
+					showAlert(`Success! Welcome ${data.user.name} (${data.user.role}). Redirecting...`, 'success');
+					localStorage.setItem('stocksense_token', data.token);
+					localStorage.setItem('stocksense_user', JSON.stringify(data.user));
+					// In production or next step: redirect to dashboard
+				} else {
+					showAlert(data.message || 'Login failed. Please check your credentials.');
+				}
+			} catch (err) {
+				showAlert('Could not connect to backend server. Make sure MongoDB and server are running.');
+			} finally {
+				submitBtn.disabled = false;
+				submitBtn.textContent = 'Login';
+			}
+		});
+	</script>
 </body>
 </html>
