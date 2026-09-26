@@ -1,5 +1,7 @@
 <% 
   const current = typeof activePage !== 'undefined' ? activePage : '';
+  const user = typeof currentUser !== 'undefined' && currentUser ? currentUser : { name: 'Alex Smith', role: 'Inventory Lead' };
+  const initials = (user.name || 'Alex Smith').split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().substring(0, 2);
 %>
 <!-- Sidebar -->
 <aside class="app-sidebar shadow-sm" id="sidebarNav">
@@ -91,15 +93,15 @@
   <div class="sidebar-footer p-3 border-top mt-auto bg-light-subtle">
     <div class="d-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center min-w-0">
-        <div class="avatar-circle bg-success text-white fw-bold me-2 flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content-center; font-size: 0.85rem;">
-          AS
+        <div class="avatar-circle bg-success text-white fw-bold me-2 flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+          <%= initials %>
         </div>
         <div class="min-w-0">
-          <div class="fw-semibold text-dark text-truncate" style="font-size: 0.85rem;">Alex Smith</div>
-          <div class="text-muted small text-truncate" style="font-size: 0.75rem;">Inventory Lead</div>
+          <div class="fw-semibold text-dark text-truncate" style="font-size: 0.85rem;"><%= user.name %></div>
+          <div class="text-muted small text-truncate" style="font-size: 0.75rem;"><%= user.role || 'Inventory Lead' %></div>
         </div>
       </div>
-      <a href="/login" class="btn btn-sm btn-outline-danger border-0 p-1 px-2" title="Sign out" aria-label="Sign out">
+      <a href="/logout" class="btn btn-sm btn-outline-danger border-0 p-1 px-2" title="Sign out" aria-label="Sign out">
         <i class="bi bi-box-arrow-right fs-6"></i>
       </a>
     </div>
